@@ -12,7 +12,29 @@ Il metodo più diffuso consiste nel depositare una striscia di polisilicio:
 
 ---
 
-### 2. Il Resistore a Diffusione nel Substrato e la Non-Linearità
+### 2. L'Effetto degli Angoli nel Layout (Raccordi a $90^\circ$ vs $45^\circ$)
+
+Quando la pista del resistore viene ripiegata a serpentina, la corrente non fluisce in modo uniforme attraverso gli spigoli:
+* **Addensamento di corrente (*Current Crowding*):** la corrente "taglia la curva" concentrandosi sullo spigolo interno (percorso a minore impedenza), mentre lo spigolo esterno resta una zona quasi inattiva.
+  * Per un angolo a $90^\circ$, il rapporto $\frac{J_{\text{max}}}{J_{\text{min}}} \approx 70$.
+  * Per un angolo a $45^\circ$, il rapporto scende a $\frac{J_{\text{max}}}{J_{\text{min}}} \approx 8$.
+  👉 Vedi: [Elettromigrazione e tossicità dei metalli](./Elettromigrazione%20e%20tossicit%C3%A0%20dei%20metalli.md) per i rischi di rottura legati ai picchi locali di densità di corrente.
+
+* **Resistenza effettiva dell'angolo:** a causa della corrente non uniforme, la regione d'angolo offre meno resistenza rispetto a un tratto rettilineo:
+  * Raccordo a $90^\circ$: $\Delta R_{90} \approx 0.59 \, R_S$ (invece di $1.0 \, R_S$, cioè un quadrato intero).
+  * Raccordo a $45^\circ$: $\Delta R_{45} \approx 0.41 \, R_S$.
+
+* **Formula pratica di calcolo con correzione $R_\Gamma$:**
+  Sommando le quote geometriche esterne dei tratti lineari ($L_1 + L_2$), la resistenza totale si corregge con il termine $R_\Gamma$:
+  $$R = R_S \frac{L_1 + L_2}{W} - R_\Gamma \quad \text{con} \quad R_\Gamma = R_S \frac{2\Delta L}{W} - \Delta R$$
+  * **Per angolo a $45^\circ$:** $R_{\Gamma 45} \approx 0 \implies \mathbf{R \approx R_S \frac{L_1 + L_2}{W}}$ (nessuna correzione necessaria!).
+  * **Per angolo a $90^\circ$:** $R_{\Gamma 90} \approx \mathbf{0.41 \, R_S} \implies \mathbf{R \approx R_S \frac{L_1 + L_2}{W} - 0.41 \, R_S}$ (si tolgono circa $0.41$ quadrati per ciascun angolo).
+
+> **Regola di Layout:** gli angoli a $45^\circ$ sono fortemente preferiti sia perché azzerano l'errore di calcolo ($R_\Gamma \approx 0$), sia perché riducono drasticamente i picchi di densità di corrente e il rischio di elettromigrazione.
+
+---
+
+### 3. Il Resistore a Diffusione nel Substrato e la Non-Linearità
 
 Un'alternativa è creare la resistenza direttamente dentro il silicio tramite una diffusione drogata (es. *N-Well* o sacca $N^+/P^+$):
 * **La giunzione $pn$ parassita:** la sacca drogata forma inevitabilmente una giunzione $pn$ con il substrato circostante, circondata da una regione di svuotamento.
@@ -24,6 +46,7 @@ Un'alternativa è creare la resistenza direttamente dentro il silicio tramite un
 
 *Pagine correlate:*
 - [Siliciuro](./Siliciuro.md)
+- [Elettromigrazione e tossicità dei metalli](./Elettromigrazione%20e%20tossicit%C3%A0%20dei%20metalli.md)
 - [MOS](./MOS.md)
 - [Condensatori](./Condensatori.md)
 - [Difficoltà nel fare un componente ideale](./Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)

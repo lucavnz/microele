@@ -33,7 +33,15 @@ Dove:
 3. **Esplosione del Leakage Sottosoglia:**
    A $V_{GS} = 0\text{ V}$, se c'è una $V_{DS}$ alta, la soglia si abbassa e la corrente di perdita $I_{OFF}$ esplode esponenzialmente.
 
+### Come si mitiga o si risolve il DIBL?
+
+1. **Nel Silicio Bulk:** Si aumenta fortemente il drogaggio del canale sotto il Gate ($N_A \uparrow$). Questo crea una barriera di potenziale più robusta, ma penalizza la mobilità dei portatori $\mu$ (per collisioni ioniche) e peggiora la dispersione statistica di soglia (*Random Dopant Fluctuation* - RDF).
+2. **Nelle Architetture Avanzate ([UTBB FD-SOI](../../Tecnologie/SOI.md)):** Si riduce lo spessore del film di silicio a soli $t_{Si} \approx 5-7\,\text{nm}$. Questo abbatte l'area laterale del canale e rende minuscola la capacità laterale di accoppiamento:
+   $$C_{\text{lat}} = \epsilon_{Si} \frac{W \cdot t_{Si}}{L}$$
+   Il Gate metallico sovrastante vince nettamente il partitore capacitivo ($C_{ox} \gg C_{\text{lat}}$), azzerando l'influenza del Drain sul Source (**Zero DIBL**).
+
 ---
+
 *Pagine correlate:*
 - [SOI](../../Tecnologie/SOI.md)
 - [Analogico non si scende di dimensioni](../Analogico%20non%20si%20scende%20di%20dimensioni.md)

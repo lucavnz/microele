@@ -56,6 +56,7 @@ Nei circuiti analogici a capacità commutate (**Switched-Capacitor**) e nei bloc
 
 ---
 *Pagine correlate:*
+- [SOI](../../Tecnologie/SOI.md)
 - [Condensatori](../../Tecnologie/Condensatori.md)
 - [DIBL](./DIBL.md)
 - [Analogico non si scende di dimensioni](../Analogico%20non%20si%20scende%20di%20dimensioni.md)
