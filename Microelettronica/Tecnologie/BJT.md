@@ -18,7 +18,7 @@ Quando si progetta un BJT, il dimensionamento segue una logica ingegneristica pr
    $$W \approx \sqrt{\frac{2\epsilon V_R}{q} \left(\frac{1}{N_B} + \frac{1}{N_C}\right)}$$
    con $N_B \gg N_C$, la formula dipende quasi unicamente da $N_C$:
    $$W_C \approx \sqrt{\frac{2\epsilon V_R}{q N_C}}$$
-   Si sceglie un drogaggio di collettore **molto debole ($N_C$ basso, circa $10^{15}\text{ cm}^{-3}$)**: in questo modo la zona di svuotamento si allarga quasi tutta nel collettore, sopportando forti tensioni senza arrivare al breakdown per valanga o tunnel.
+   Si sceglie un drogaggio di collettore **molto debole ($N_C$ basso, circa $10^{15}\text{ cm}^{-3}$)**: in questo modo la zona di svuotamento si allarga quasi tutta nel collettore, sopportando forti tensioni senza arrivare al [Breakdown](./Breakdown%20e%20Diodo%20Zener.md) per valanga o tunnel.
 
 2. **La Base ($N_B$ drogaggio intermedio) evita il Punch-Through:**
    Per il principio di neutralità di carica all'interfaccia, la carica svuotata nella base deve eguagliare quella nel collettore:
@@ -104,6 +104,7 @@ Cortocircuitando Base e Collettore ($V_{BC} = 0$), il BJT si comporta come un [D
 
 *Pagine correlate:*
 - [Diodo](./Diodo.md)
+- [Breakdown e Diodo Zener](./Breakdown%20e%20Diodo%20Zener.md)
 - [MOS](./MOS.md)
 - [Difficoltà nel fare un componente ideale](./Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Siliciuro](./Siliciuro.md)

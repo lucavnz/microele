@@ -50,5 +50,7 @@ Un'alternativa è creare la resistenza direttamente dentro il silicio tramite un
 - [MOS](./MOS.md)
 - [Condensatori](./Condensatori.md)
 - [Difficoltà nel fare un componente ideale](./Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
+- [Narrow resistenze](./Narrow%20resistenze.md)
+- [Induttore](./Induttore.md)
 - [Analogico non si scende di dimensioni](../Introduzione/Analogico%20non%20si%20scende%20di%20dimensioni.md)
 - [Wafer produzione](./Wafer%20produzione.md)

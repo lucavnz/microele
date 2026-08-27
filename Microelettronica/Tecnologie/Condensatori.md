@@ -39,7 +39,9 @@ Per aumentare la capacità senza consumare troppa superficie orizzontale di wafe
 ---
 
 *Pagine correlate:*
+- [Diodo](./Diodo.md)
 - [MOS](./MOS.md)
 - [Resistore](./Resistore.md)
+- [Induttore](./Induttore.md)
 - [Difficoltà nel fare un componente ideale](./Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Wafer produzione](./Wafer%20produzione.md)
