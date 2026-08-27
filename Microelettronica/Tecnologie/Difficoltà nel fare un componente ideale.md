@@ -35,6 +35,7 @@ Dobbiamo passare alla **teoria delle linee di trasmissione e delle radiofrequenz
 
 *Pagine correlate:*
 - [Diodo](./Diodo.md)
+- [Transitori del diodo e capacità](./Transitori%20del%20diodo%20e%20capacita.md)
 - [Breakdown e Diodo Zener](./Breakdown%20e%20Diodo%20Zener.md)
 - [BJT](./BJT.md)
 - [MOS](./MOS.md)

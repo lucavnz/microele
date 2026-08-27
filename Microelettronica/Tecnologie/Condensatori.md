@@ -40,6 +40,7 @@ Per aumentare la capacità senza consumare troppa superficie orizzontale di wafe
 
 *Pagine correlate:*
 - [Diodo](./Diodo.md)
+- [Transitori del diodo e capacità](./Transitori%20del%20diodo%20e%20capacita.md)
 - [MOS](./MOS.md)
 - [Resistore](./Resistore.md)
 - [Induttore](./Induttore.md)

@@ -115,6 +115,7 @@ Legge:             Cj ∝ 1 / √(Vbi - V)                     Cd ∝ ID ∝ exp
   (con $\tau_T$ tempo di transito medio dei minoritari). Derivando rispetto alla tensione:
   $$C_d = \frac{dQ_{diff}}{dV} = \tau_T \frac{dI_D}{dV} = \tau_T \cdot g_d = \tau_T \frac{I_D}{V_T}$$
 * **Impatto circuitale:** Poiché $I_D \propto e^{V/V_T}$, **$C_d$ esplode esponenzialmente** con la tensione (da $\text{pF}$ a centinaia di $\text{nF}$). Questa carica immagazzinata deve essere evacuata per spegnere il diodo, introducendo il **tempo di recupero inverso ($t_{rr}$)** che rende le giunzioni $PN$ lente a commutare rispetto ai diodi Schottky.
+  👉 Approfondimento: [Transitori del diodo e capacità](./Transitori%20del%20diodo%20e%20capacita.md) per l'analisi dettagliata del regime quasi-stazionario, dei componenti anomali e delle due fasi dei transitori di accensione e spegnimento.
 
 #### C. Circuito Equivalente Completo
 Il modello a parametri concentrati riunisce tutti i rami fisici:
@@ -249,6 +250,7 @@ Nei circuiti analogici di precisione si preferisce realizzare il diodo prendendo
 ---
 
 *Pagine correlate:*
+- [Transitori del diodo e capacità](./Transitori%20del%20diodo%20e%20capacita.md)
 - [Breakdown e Diodo Zener](./Breakdown%20e%20Diodo%20Zener.md)
 - [BJT](./BJT.md)
 - [MOS](./MOS.md)
