@@ -1,45 +1,121 @@
-Il succo fondamentale di quelle slide (Slide 83, 84 e 85, pagine PDF 79-81) è questo:
+Ran command: `python -c "
+import fitz, sys
+sys.stdout.reconfigure(encoding='utf-8')
 
-> **In alta frequenza l'induttanza non dipende solo dal singolo filo, ma da *DOVE e COME* torna indietro la corrente (percorso di ritorno) e da cosa fanno i fili vicini (accoppiamento magnetico / crosstalk).**
+doc = fitz.open(r'c:\Users\Accetazione\Downloads\microele\modelli.pdf')
 
-Nel silicio non puoi considerare una pista metallica isolata: ogni corrente che va da qualche parte deve richiudersi a terra (o su un altro filo). A seconda di dove scorre il ritorno e di come commutano i fili adiacenti, **il campo magnetico cambia radicalmente forma, confinando o sparando rumore in tutto il chip**.
+for page_idx in range(143, min(154, len(doc))):
+    print(f'==============================')
+    print(f'=== SLIDE {page_idx+1} (Page {page_idx+1}) ===')
+    print(f'==============================')
+    print(doc[page_idx].get_text())
+"`
 
-Vediamo i tre casi messi a confronto dal professore:
-
----
-
-### Caso 1: "2 CONDUTTORI" (Slide 83) – Andata su pista, Ritorno sul piano
-* **La situazione:** C'è la pista **B** in alto che porta la corrente di andata ($+1\text{ A}$) e il piano conduttivo **A** sotto (il piano di massa o il substrato) che porta il ritorno ($-1\text{ A}$).
-* **Cosa vedi nella simulazione:**  
-  Il campo magnetico (le linee di flusso colorate) si sviluppa **tra la pista e il piano sottostante**.
-* **Il succo:**  
-  L'induttanza parassita è proporzionale all'**area del loop** tra andata e ritorno. Più la pista è vicina al piano di massa (distanza $h$ piccola), più il loop è stretto, minore è l'induttanza parassita $L$ e minore è il campo disperso.
+Ecco una spiegazione completa, fisica e numerica della **Slide 146** e del funzionamento in sottosoglia del MOS.
 
 ---
 
-### Caso 2: "3 CONDUTTORI" con correnti concordi (Slide 84) – Modo Comune / Bus Dati
-* **La situazione:** Immagina due piste metalliche vicine (**B** e **C**, come due linee di un bus dati) che commutano insieme nello stesso verso: entrambe portano corrente di andata ($+0.5\text{ A}$ e $+0.5\text{ A}$). Il ritorno comune ($-1\text{ A}$) scorre tutto sul piano inferiore **A**.
-* **Cosa vedi nella simulazione:**  
-  I campi magnetici generati da B e C girano nello stesso verso e si **fondono/sommano insieme**, creando una "bolla" magnetica gigante che abbraccia entrambi i conduttori.
-* **Il succo:**
-  * Si crea una **mutua induttanza positiva ($+M$)**: il campo di una pista entra dentro l'altra creando **crosstalk induttivo** (rumore e interferenza tra segnali vicini).
-  * L'induttanza totale vista da ciascuna linea **aumenta** ($L_{eff} = L + M$), rallentando la propagazione dei segnali.
+### 1. Cosa succede in Sottosoglia? (Slide 146)
+
+Nel modello circuitale semplificato si insegna che se $V_{GS} < V_T$ il transistore è spento ($I_D = 0$). 
+**Nella realtà fisica non è così**: quando $V_{GS} < V_T$, il silicio si trova in **debole inversione** ($V_{FB} < V_{GS} < V_T$). 
+
+* All'interfaccia non c'è ancora un canale continuo e denso di elettroni, ma c'è già una **piccola densità di elettroni liberi**:
+  $$n(0) \propto e^{\frac{q\Phi_S}{k_B T}}$$
+* La corrente $I_D$ non è zero: **scorre una corrente che varia in modo puramente ESPONENZIALE con $V_{GS}$**, esattamente come in un diodo o in un BJT!
+
+```
+     Corrente I_D (Scala Logaritmica)
+           ^
+    1 mA   │                         / (Forte inversione: curva parabolica/lineare)
+           │                        /
+    1 μA   │                       /
+           │                      /  <── V_GS = V_T
+    1 nA   │                     /
+           │                    /
+    1 pA   │                   /   (Sottosoglia: retta esponenziale a pendenza costante!)
+           │                  /
+           └─────────────────┴────────────────────────► V_GS
+                             V_T
+```
 
 ---
 
-### Caso 3: "3 CONDUTTORI" con correnti opposte (Slide 85) – Coppia Differenziale
-* **La situazione:** Le due piste vicine portano correnti uguali ma **OPPOSTE**: la pista **B** porta l'andata ($+1\text{ A}$) e la pista adiacente **C** porta il ritorno ($-1\text{ A}$). Il piano sottostante **A** ha corrente nulla ($0\text{ A}$).
-* **Cosa vedi nella simulazione:**  
-  Il campo magnetico si richiude **strettissimo ad anello solo tra B e C**! A destra e a sinistra i due campi magnetici (essendo generati da correnti contrarie a brevissima distanza) **si cancellano a vicenda**. Il piano sotto A non vede quasi campo magnetico.
-* **Il succo:**
-  * È il principio della **linea differenziale (differential pair)** o del doppino intrecciato.
-  * Il campo magnetico è ultra-confinato: **zero rumore iniettato nel substrato** e **zero interferenze verso l'esterno**.
-  * L'induttanza equivalente del loop crolla ($L_{diff} \approx 2(L - M)$), permettendo di andare a frequenze altissime.
+### 2. Perché si comporta "simil-BJT"? (Diffusione vs Deriva)
+
+La differenza fondamentale tra il funzionamento normale e quello in sottosoglia sta nel **meccanismo fisico con cui si muovono gli elettroni**:
+
+| Regime | Come si muovono le cariche | Formula Corrente | Come in... |
+| :--- | :--- | :--- | :--- |
+| **Forte Inversione ($V_{GS} > V_T$)** | **Deriva (Drift):** C'è una pista conduttiva (il canale). Il campo elettrico tra Drain e Source trascina gli elettroni con una velocità $v = \mu E$. | $I_D \propto (V_{GS} - V_T)^2$ | Resistore controllato |
+| **Sottosoglia ($V_{GS} < V_T$)** | **Diffusione (Diffusion):** Non c'è un canale continuo. Gli elettroni saltano la barriera di potenziale termicamente e **diffondono** per gradiente di concentrazione dal Source al Drain. | $I_D \propto e^{\frac{q V_{GS}}{n k_B T}}$ | **BJT** ($I_C \propto e^{\frac{q V_{BE}}{k_B T}}$) |
+
+Fisicamente, la struttura $n^+ (\text{Source}) - p (\text{Substrato}) - n^+ (\text{Drain})$ in debole inversione funziona esattamente come un **transistore BJT NPN laterale**, dove:
+* Il **Source** fa da *Emettitore* (inietta elettroni).
+* La regione sotto l'ossido fa da *Base* (attraversata per diffusione).
+* Il **Drain** fa da *Collettore* (raccoglie gli elettroni).
+* Il **Gate** fa da morsetto che abbassa la barriera di potenziale della base elettrostaticamente.
 
 ---
 
-### Perché il professore lo spiega subito prima dell'Induttore a Spirale (Slide 86)?
+### 3. Da dove saltano fuori i "$60\text{ mV/decade}$"? (Subthreshold Swing $S$)
 
-Per due motivi pratici:
-1. **Per capire come funziona l'induttore a spirale:** Un induttore a spirale è fatto proprio da tante piste affiancate (le spire). Poiché la corrente gira nello stesso verso in tutte le spire adiacenti (come nel **Caso 2**), i campi magnetici di ogni spira si sommano costruttivamente facendo crescere l'induttanza con il quadrato del numero di spire ($L \propto n^2$).
-2. **Per capire la "sfiga" dell'induttore:** Quella bolla magnetica gigante penetra dritto nel silicio sottostante (come nel Caso 2 verso il piano A), inducendo correnti parassite dissipative (*eddy currents*) nel substrato conduttivo.
+La **pendenza di sottosoglia** (o *Subthreshold Swing*, $S$) indica:
+> *"Di quanti millivolt devo aumentare $V_{GS}$ per far decuplicare ($10\times$, cioè 1 decade) la corrente $I_D$?"*
+
+#### A) Il calcolo teorico ideale
+La corrente è $I_D \propto e^{\frac{q \Phi_S}{k_B T}} = 10^{\frac{q \Phi_S}{\ln(10) k_B T}}$.
+Se ogni variazione di Gate si trasferisse interamente alla superficie ($\Delta\Phi_S = \Delta V_{GS}$), la pendenza ideale sarebbe:
+
+$$S_{ideale} = \ln(10) \cdot \frac{k_B T}{q} = \ln(10) \cdot \Phi_T$$
+
+A temperatura ambiente ($T = 300\text{ K}$), il potenziale termico è $\Phi_T = \frac{k_B T}{q} \approx 25.86\text{ mV}$:
+$$S_{ideale} = 2.3026 \times 25.86\text{ mV} \approx \mathbf{59.6\text{ mV/decade} \approx 60\text{ mV/decade}}$$
+
+#### B) Nei dispositivi reali (il partitore capacitivo $\alpha$)
+Come visto prima, tra il Gate e il silicio c'è il partitore capacitivo tra l'ossido $C_{ox}$ e la capacità di svuotamento $C_d$:
+$$d\Phi_S = \frac{C_{ox}}{C_{ox} + C_d} dV_{GS} = \frac{1}{1 + \alpha} dV_{GS} \quad \text{con } \alpha = \frac{C_d}{C_{ox}}$$
+
+Quindi nei dispositivi reali (Slide 146):
+$$S = \frac{d V_{GS}}{d(\log_{10} I_D)} = \ln(10) \frac{k_B T}{q} (1 + \alpha) = 60\text{ mV} \cdot (1 + \alpha)$$
+
+Poiché $\alpha > 0$, nei MOS reali servono tipicamente **$70\text{–}90\text{ mV}$** per aumentare la corrente di una decade.
+
+> 🔋 **Perché è fondamentale nei chip moderni?**
+> Se hai una corrente di perdita (*leakage*) a riposo e vuoi ridurla di un milione di volte ($10^6$, cioè 6 decadi), devi dare al Gate almeno $6 \times 80\text{ mV} = 480\text{ mV}$ di margine sotto la soglia. È per questo che non si può abbassare la tensione di alimentazione dei microprocessori a piacere senza avere dispersioni di batteria enormi!
+
+---
+
+### 4. Debole, Moderata e Forte Inversione: esistono confini netti?
+
+Hai colto un punto cruciale di microelettronica: **la fisica è continua**, la transizione tra spento e acceso non è un interruttore a scatto a $V_T$.
+
+Si definiscono convenzionalmente 3 regioni in base alla tensione di **Overdrive ($V_{ov} = V_{GS} - V_T$)**:
+
+```
+        DEBOLE INVERSIONE         MODERATA INVERSIONE            FORTE INVERSIONE
+         (Sottosoglia)              (Transizione)
+◄──────────────────────────────┼────────────────────────┼────────────────────────►
+     V_GS - V_T < -50 mV        -50 mV < V_ov < +150 mV       V_GS - V_T > 200 mV
+```
+
+1. **Debole Inversione (Weak Inversion / Sottosoglia):**
+   * Corrisponde a $V_{GS} \le V_T - 50\text{ mV}$ (Overdrive negativo).
+   * La carica mobile $Q_i$ è trascurabile rispetto alla carica fissa $Q_d$.
+   * Trasporto: **Diffusione pura**.
+   * Relazione $I_D(V_{GS})$: **Puro esponenziale** ($I_D \propto e^{V_{GS}}$).
+   * Massima efficienza energetica: altissimo rapporto transconduttanza/corrente ($g_m/I_D \approx 25\text{--}28\text{ V}^{-1}$, usato nei circuiti ultra-low-power come gli smartwatch o i pacemaker).
+
+2. **Moderata Inversione (Moderate Inversion):**
+   * Intervallo a cavallo della soglia: da circa **$-50\text{ mV}$ a $+150\text{ mV}$** di Overdrive.
+   * La carica mobile e la carica fissa sono confrontabili ($Q_i \approx Q_d$).
+   * Trasporto: coesistono sia deriva che diffusione.
+   * La formula non è né puramente esponenziale né puramente quadratica (è la zona di raccordo).
+
+3. **Forte Inversione (Strong Inversion):**
+   * Corrisponde a un Overdrive sicuro **$V_{ov} = V_{GS} - V_T \ge 150\text{--}200\text{ mV}$**.
+   * La carica mobile di canale $Q_i$ sovrasta totalmente la carica di svuotamento.
+   * Trasporto: **Deriva (Drift)**.
+   * Relazione $I_D(V_{GS})$: **Quadratica** a canale lungo ($I_D \propto V_{ov}^2$) o **Lineare** a canale corto (per saturazione della velocità).
+
+Quindi la tua intuizione è esattissima: quando in progettazione analogica vogliamo essere **sicuri** di essere in piena forte inversione (dove valgono le formule quadratiche classiche), imponiamo un Overdrive di almeno **$150\text{--}200\text{ mV}$**.

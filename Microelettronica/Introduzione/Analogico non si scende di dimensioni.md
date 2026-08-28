@@ -44,6 +44,7 @@ Nei transistor piccoli il rumore $1/f$ esplode con $1/(W \cdot L)$, soffocando i
 ---
 
 *Pagine correlate:*
+- [La soglia da cosa dipende](./La%20soglia%20da%20cosa%20dipende.md)
 - [BJT](../Tecnologie/BJT.md)
 - [Diodo](../Tecnologie/Diodo.md)
 - [MOS](../Tecnologie/MOS.md)

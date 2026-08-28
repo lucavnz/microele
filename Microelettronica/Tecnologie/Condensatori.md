@@ -10,6 +10,7 @@ Per realizzare un condensatore planare classico abbiamo due strade principali:
   Si sfrutta la capacità di gate di un transistor MOSFET (tra Gate e canale, con Source e Drain cortocircuitati).
   * *Vantaggio:* **Zero maschere aggiuntive** (usa i passaggi standard del transistor) e dielettrico sottilissimo ($t_{ox}$ piccolo $\implies C_{ox}$ elevata).
   * *Svantaggio:* Fortemente **non lineare** con la tensione (la capacità varia drasticamente se il canale non è formato).
+  👉 Approfondimento sulla fisica e i regimi del MOS: [La soglia da cosa dipende](../Introduzione/La%20soglia%20da%20cosa%20dipende.md)
 
 * **Il Condensatore Poly-Poly ($\text{Poly1}$-$\text{Poly2}$ / PIP):**
   Due strati di polisilicio conduttivo separati da un sottile ossido dielettrico dedicato.
@@ -42,6 +43,7 @@ Per aumentare la capacità senza consumare troppa superficie orizzontale di wafe
 - [Diodo](./Diodo.md)
 - [Transitori del diodo e capacità](./Transitori%20del%20diodo%20e%20capacita.md)
 - [MOS](./MOS.md)
+- [La soglia da cosa dipende](../Introduzione/La%20soglia%20da%20cosa%20dipende.md)
 - [Resistore](./Resistore.md)
 - [Induttore](./Induttore.md)
 - [Difficoltà nel fare un componente ideale](./Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
