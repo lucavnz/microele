@@ -1,121 +1,68 @@
-Ran command: `python -c "
-import fitz, sys
-sys.stdout.reconfigure(encoding='utf-8')
+Il tuo dubbio è legittimo ed è uno dei concetti più affascinanti della fisica dei circuiti.
 
-doc = fitz.open(r'c:\Users\Accetazione\Downloads\microele\modelli.pdf')
+La risposta breve è: **quel 50% si perde per forza per la conservazione dell'energia, e non dipende dal valore della resistenza (che infatti si cancella nei conti)!**
 
-for page_idx in range(143, min(154, len(doc))):
-    print(f'==============================')
-    print(f'=== SLIDE {page_idx+1} (Page {page_idx+1}) ===')
-    print(f'==============================')
-    print(doc[page_idx].get_text())
-"`
-
-Ecco una spiegazione completa, fisica e numerica della **Slide 146** e del funzionamento in sottosoglia del MOS.
+Vediamo passo dopo passo perché succede matematicamente e fisicamente.
 
 ---
 
-### 1. Cosa succede in Sottosoglia? (Slide 146)
+### 1. Il confronto diretto tra i due integrali (Senza tirare in ballo resistenze)
 
-Nel modello circuitale semplificato si insegna che se $V_{GS} < V_T$ il transistore è spento ($I_D = 0$). 
-**Nella realtà fisica non è così**: quando $V_{GS} < V_T$, il silicio si trova in **debole inversione** ($V_{FB} < V_{GS} < V_T$). 
+Mettiamo a confronto l'integrale dell'**alimentatore** e l'integrale del **condensatore**:
 
-* All'interfaccia non c'è ancora un canale continuo e denso di elettroni, ma c'è già una **piccola densità di elettroni liberi**:
-  $$n(0) \propto e^{\frac{q\Phi_S}{k_B T}}$$
-* La corrente $I_D$ non è zero: **scorre una corrente che varia in modo puramente ESPONENZIALE con $V_{GS}$**, esattamente come in un diodo o in un BJT!
+#### A) Quanta energia ha speso l'alimentatore?
+L'alimentatore sta a tensione **fissa** $V_{DD}$. Per spostare una carica totale $Q = C \cdot V_{DD}$ a potenziale costante $V_{DD}$, l'alimentatore compie un lavoro pari a:
+$$E_{\text{alim}} = \int_0^\infty V_{DD} \cdot i(t) \, dt = V_{DD} \int_0^Q dq = V_{DD} \cdot Q = V_{DD} \cdot (C \cdot V_{DD}) = \mathbf{C V_{DD}^2}$$
 
-```
-     Corrente I_D (Scala Logaritmica)
-           ^
-    1 mA   │                         / (Forte inversione: curva parabolica/lineare)
-           │                        /
-    1 μA   │                       /
-           │                      /  <── V_GS = V_T
-    1 nA   │                     /
-           │                    /
-    1 pA   │                   /   (Sottosoglia: retta esponenziale a pendenza costante!)
-           │                  /
-           └─────────────────┴────────────────────────► V_GS
-                             V_T
-```
+#### B) Quanta energia ha assorbito il condensatore?
+Mentre il condensatore si carica, la sua tensione $v_C(t)$ **non è fissa a $V_{DD}$**, ma parte da $0\text{ V}$ e sale pian piano fino a $V_{DD}$. 
+Quindi le prime cariche entrano a $0\text{ V}$, le seconde a $0.5\text{ V}$, le ultime a $V_{DD}$.
+
+L'energia immagazzinata nel campo elettrico del condensatore è l'integrale della potenza **sul condensatore**:
+$$E_C = \int_0^\infty v_C(t) \cdot i(t) \, dt = \int_0^\infty v_C(t) \cdot \left( C \frac{dv_C}{dt} \right) dt = C \int_0^{V_{DD}} v_C \, dv_C$$
+
+Risolvendo l'integrale:
+$$E_C = C \left[ \frac{v_C^2}{2} \right]_0^{V_{DD}} = \mathbf{\frac{1}{2} C V_{DD}^2}$$
 
 ---
 
-### 2. Perché si comporta "simil-BJT"? (Diffusione vs Deriva)
+### 2. Dov'è finita la differenza? ($\Delta E = E_{\text{alim}} - E_C$)
 
-La differenza fondamentale tra il funzionamento normale e quello in sottosoglia sta nel **meccanismo fisico con cui si muovono gli elettroni**:
+Facendo la sottrazione:
+$$E_{\text{persa}} = E_{\text{alim}} - E_C = C V_{DD}^2 - \frac{1}{2} C V_{DD}^2 = \mathbf{\frac{1}{2} C V_{DD}^2}$$
 
-| Regime | Come si muovono le cariche | Formula Corrente | Come in... |
-| :--- | :--- | :--- | :--- |
-| **Forte Inversione ($V_{GS} > V_T$)** | **Deriva (Drift):** C'è una pista conduttiva (il canale). Il campo elettrico tra Drain e Source trascina gli elettroni con una velocità $v = \mu E$. | $I_D \propto (V_{GS} - V_T)^2$ | Resistore controllato |
-| **Sottosoglia ($V_{GS} < V_T$)** | **Diffusione (Diffusion):** Non c'è un canale continuo. Gli elettroni saltano la barriera di potenziale termicamente e **diffondono** per gradiente di concentrazione dal Source al Drain. | $I_D \propto e^{\frac{q V_{GS}}{n k_B T}}$ | **BJT** ($I_C \propto e^{\frac{q V_{BE}}{k_B T}}$) |
-
-Fisicamente, la struttura $n^+ (\text{Source}) - p (\text{Substrato}) - n^+ (\text{Drain})$ in debole inversione funziona esattamente come un **transistore BJT NPN laterale**, dove:
-* Il **Source** fa da *Emettitore* (inietta elettroni).
-* La regione sotto l'ossido fa da *Base* (attraversata per diffusione).
-* Il **Drain** fa da *Collettore* (raccoglie gli elettroni).
-* Il **Gate** fa da morsetto che abbassa la barriera di potenziale della base elettrostaticamente.
+Per il principio di conservazione dell'energia (Primo Principio della Termodinamica), quell'energia mancante **deve essere stata dissipata nel percorso** che collega l'alimentatore al condensatore (cioè attraverso il canale conduttivo del transistor PMOS e i fili metallici).
 
 ---
 
-### 3. Da dove saltano fuori i "$60\text{ mV/decade}$"? (Subthreshold Swing $S$)
+### 3. La "Magia": Perché la Resistenza non compare nella formula finale?
 
-La **pendenza di sottosoglia** (o *Subthreshold Swing*, $S$) indica:
-> *"Di quanti millivolt devo aumentare $V_{GS}$ per far decuplicare ($10\times$, cioè 1 decade) la corrente $I_D$?"*
+Potresti chiederti: *"Ma se c'è una resistenza $R$ nel transistor, perché l'energia dissipata non dipende da $R$?"*
 
-#### A) Il calcolo teorico ideale
-La corrente è $I_D \propto e^{\frac{q \Phi_S}{k_B T}} = 10^{\frac{q \Phi_S}{\ln(10) k_B T}}$.
-Se ogni variazione di Gate si trasferisse interamente alla superficie ($\Delta\Phi_S = \Delta V_{GS}$), la pendenza ideale sarebbe:
+Facciamo il calcolo esplicito dell'energia dissipata su una generica resistenza $R$ per effetto Joule ($P = R \cdot i^2$):
 
-$$S_{ideale} = \ln(10) \cdot \frac{k_B T}{q} = \ln(10) \cdot \Phi_T$$
+1. In un circuito $RC$, la corrente di carica vale: 
+   $$i(t) = \frac{V_{DD}}{R} e^{-\frac{t}{RC}}$$
+2. L'energia dissipata in calore sulla resistenza è:
+   $$E_R = \int_0^\infty R \cdot [i(t)]^2 \, dt = R \int_0^\infty \left( \frac{V_{DD}}{R} e^{-\frac{t}{RC}} \right)^2 dt = \frac{V_{DD}^2}{R} \int_0^\infty e^{-\frac{2t}{RC}} dt$$
+3. Risolvendo l'integrale esponenziale:
+   $$\int_0^\infty e^{-\frac{2t}{RC}} dt = \left[ -\frac{RC}{2} e^{-\frac{2t}{RC}} \right]_0^\infty = 0 - \left( -\frac{RC}{2} \right) = \frac{RC}{2}$$
+4. Moltiplichiamo per il termine fuori dall'integrale:
+   $$E_R = \frac{V_{DD}^2}{\cancel{R}} \cdot \frac{\cancel{R} C}{2} = \mathbf{\frac{1}{2} C V_{DD}^2}$$
 
-A temperatura ambiente ($T = 300\text{ K}$), il potenziale termico è $\Phi_T = \frac{k_B T}{q} \approx 25.86\text{ mV}$:
-$$S_{ideale} = 2.3026 \times 25.86\text{ mV} \approx \mathbf{59.6\text{ mV/decade} \approx 60\text{ mV/decade}}$$
+> **Il risultato straordinario:**
+> **La resistenza $R$ al denominatore si cancella esattamente con la $R$ al numeratore!**
 
-#### B) Nei dispositivi reali (il partitore capacitivo $\alpha$)
-Come visto prima, tra il Gate e il silicio c'è il partitore capacitivo tra l'ossido $C_{ox}$ e la capacità di svuotamento $C_d$:
-$$d\Phi_S = \frac{C_{ox}}{C_{ox} + C_d} dV_{GS} = \frac{1}{1 + \alpha} dV_{GS} \quad \text{con } \alpha = \frac{C_d}{C_{ox}}$$
-
-Quindi nei dispositivi reali (Slide 146):
-$$S = \frac{d V_{GS}}{d(\log_{10} I_D)} = \ln(10) \frac{k_B T}{q} (1 + \alpha) = 60\text{ mV} \cdot (1 + \alpha)$$
-
-Poiché $\alpha > 0$, nei MOS reali servono tipicamente **$70\text{–}90\text{ mV}$** per aumentare la corrente di una decade.
-
-> 🔋 **Perché è fondamentale nei chip moderni?**
-> Se hai una corrente di perdita (*leakage*) a riposo e vuoi ridurla di un milione di volte ($10^6$, cioè 6 decadi), devi dare al Gate almeno $6 \times 80\text{ mV} = 480\text{ mV}$ di margine sotto la soglia. È per questo che non si può abbassare la tensione di alimentazione dei microprocessori a piacere senza avere dispersioni di batteria enormi!
+* **Se $R$ è piccolissima (transistor grandissimo e conduttivo):** la corrente iniziale $I$ è enorme ($I^2$ gigantesco), ma il tempo di carica è brevissimo $\implies$ l'energia dissipata è comunque $\frac{1}{2} C V_{DD}^2$.
+* **Se $R$ è grandissima (transistor piccolo e resistivo):** la corrente $I$ è minuscola ($I^2$ piccolo), ma il tempo di carica dura tantissimo $\implies$ l'energia dissipata è sempre $\frac{1}{2} C V_{DD}^2$.
 
 ---
 
-### 4. Debole, Moderata e Forte Inversione: esistono confini netti?
+### 4. L'Intuizione Fisica (L'analogia del serbatoio)
 
-Hai colto un punto cruciale di microelettronica: **la fisica è continua**, la transizione tra spento e acceso non è un interruttore a scatto a $V_T$.
-
-Si definiscono convenzionalmente 3 regioni in base alla tensione di **Overdrive ($V_{ov} = V_{GS} - V_T$)**:
-
-```
-        DEBOLE INVERSIONE         MODERATA INVERSIONE            FORTE INVERSIONE
-         (Sottosoglia)              (Transizione)
-◄──────────────────────────────┼────────────────────────┼────────────────────────►
-     V_GS - V_T < -50 mV        -50 mV < V_ov < +150 mV       V_GS - V_T > 200 mV
-```
-
-1. **Debole Inversione (Weak Inversion / Sottosoglia):**
-   * Corrisponde a $V_{GS} \le V_T - 50\text{ mV}$ (Overdrive negativo).
-   * La carica mobile $Q_i$ è trascurabile rispetto alla carica fissa $Q_d$.
-   * Trasporto: **Diffusione pura**.
-   * Relazione $I_D(V_{GS})$: **Puro esponenziale** ($I_D \propto e^{V_{GS}}$).
-   * Massima efficienza energetica: altissimo rapporto transconduttanza/corrente ($g_m/I_D \approx 25\text{--}28\text{ V}^{-1}$, usato nei circuiti ultra-low-power come gli smartwatch o i pacemaker).
-
-2. **Moderata Inversione (Moderate Inversion):**
-   * Intervallo a cavallo della soglia: da circa **$-50\text{ mV}$ a $+150\text{ mV}$** di Overdrive.
-   * La carica mobile e la carica fissa sono confrontabili ($Q_i \approx Q_d$).
-   * Trasporto: coesistono sia deriva che diffusione.
-   * La formula non è né puramente esponenziale né puramente quadratica (è la zona di raccordo).
-
-3. **Forte Inversione (Strong Inversion):**
-   * Corrisponde a un Overdrive sicuro **$V_{ov} = V_{GS} - V_T \ge 150\text{--}200\text{ mV}$**.
-   * La carica mobile di canale $Q_i$ sovrasta totalmente la carica di svuotamento.
-   * Trasporto: **Deriva (Drift)**.
-   * Relazione $I_D(V_{GS})$: **Quadratica** a canale lungo ($I_D \propto V_{ov}^2$) o **Lineare** a canale corto (per saturazione della velocità).
-
-Quindi la tua intuizione è esattissima: quando in progettazione analogica vogliamo essere **sicuri** di essere in piena forte inversione (dove valgono le formule quadratiche classiche), imponiamo un Overdrive di almeno **$150\text{--}200\text{ mV}$**.
+Immagina di dover riempire d'acqua un secchio alto $V_{DD}$ prendendo l'acqua da una cascata che si trova a quota fissa $V_{DD}$:
+* L'acqua parte sempre con energia potenziale $m g V_{DD}$ (fornita dall'alimentatore).
+* All'inizio il secchio è vuoto: l'acqua precipita dall'altezza $V_{DD}$ fino al fondo ($0\text{ metri}$) e sbatte sul fondo dissipando tutta la sua energia cinetica in schizzi e calore.
+* Man mano che il secchio si riempie, il dislivello tra la cascata e la superficie dell'acqua diminuisce.
+* In media, l'acqua è caduta da un dislivello medio pari a **metà altezza ($\frac{V_{DD}}{2}$)**.
+* Quindi, **esattamente metà dell'energia potenziale è andata persa nell'urto/turbolenza**, mentre solo l'altra metà resta immagazzinata come energia potenziale del fluido nel secchio.
