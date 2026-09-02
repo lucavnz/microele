@@ -3,7 +3,7 @@
 ### 1. Il MOSFET non è un interruttore ideale ON/OFF
 Nei modelli digitali semplificati si assume spesso che per $V_{GS} < V_{th}$ la corrente sia esattamente zero. Nella realtà fisica la transizione è continua.
 
-Quando $V_{GS} < V_{th}$ (regime di **debole inversione** o **sottosoglia**, vedi la fisica dei regimi in [La soglia da cosa dipende](../Dispositivi%20e%20Componenti/La%20soglia%20da%20cosa%20dipende.md)), non c'è ancora un canale continuo di elettroni, ma i portatori si muovono per **diffusione** (come nei transistori bipolari BJT). 
+Quando $V_{GS} < V_{th}$ (regime di **debole inversione** o **sottosoglia**, vedi [Overdrive e Regioni di Inversione](../Dispositivi%20e%20Componenti/Overdrive%20e%20Regioni%20di%20Inversione.md) e [La soglia da cosa dipende](../Dispositivi%20e%20Componenti/La%20soglia%20da%20cosa%20dipende.md)), non c'è ancora un canale continuo di elettroni, ma i portatori si muovono per **diffusione** (come nei transistori bipolari [BJT](../Dispositivi%20e%20Componenti/BJT.md)). 
 La corrente segue una legge **esponenziale**:
 
 $$I_{D,sub} = I_0 \cdot \exp\left( \frac{V_{GS} - V_{th}}{n V_T} \right) \cdot \left(1 - \exp\left(-\frac{V_{DS}}{V_T}\right)\right)$$
@@ -56,6 +56,7 @@ Nei circuiti analogici a capacità commutate (**Switched-Capacitor**) e nei bloc
 
 ---
 *Pagine correlate:*
+- [Overdrive e Regioni di Inversione](../Dispositivi%20e%20Componenti/Overdrive%20e%20Regioni%20di%20Inversione.md)
 - [La soglia da cosa dipende](../Dispositivi%20e%20Componenti/La%20soglia%20da%20cosa%20dipende.md)
 - [SOI](../Dispositivi%20e%20Componenti/SOI.md)
 - [Condensatori](../Dispositivi%20e%20Componenti/Condensatori.md)

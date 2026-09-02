@@ -123,11 +123,27 @@ Le tasche di Source ($n^+$) e Drain ($n^+$) immerse nel substrato $p$ formano du
 Le loro capacità parassite dipendono dalla tensione inversa applicata $V_R$ secondo la legge delle giunzioni:
 $$C_j(V_R) = \frac{C_{j0}}{\left(1 + \frac{V_R}{\Phi_0}\right)^m}$$
 
-Ciascuna si scompone in due parti geometriche:
-1. **Capacità di Fondo (*Bottom Plate*):** dovuta all'area piana inferiore della sacca ($Area = W \cdot L_{diff}$).
-2. **Capacità Perimetrale (*Sidewall*):** dovuta al perimetro laterale a contatto con l'ossido di isolamento ([STI/LOCOS]STI/LOCOS](./MOS.md)) e con il canale.
+La capacità totale della sacca si scompone rigorosamente in due parti geometriche:
+$$C_{\text{giunzione}} = \underbrace{c_j \cdot (W \cdot L_D)}_{\text{Fondo (Area)}} + \underbrace{c_{jsw} \cdot (2W + 2L_D)}_{\text{Pareti Laterali (Perimetro STI / Channel-stop)}}$$
 
-👉 Per abbattere drasticamente $C_{DB}$ e $C_{SB}$ si impiega la tecnologia [SOI (Silicon On Insulator)]SOI (Silicon On Insulator)](./SOI.md), dove l'ossido sepolto BOX sostituisce il silicio massivo.
+1. **Capacità di Fondo (*Bottom Plate*):** dovuta all'area piana orizzontale della sacca ($Area = W \cdot L_D$).
+2. **Capacità Perimetrale (*Sidewall*):** dovuta alle 4 pareti laterali verticali a contatto con il canale e con l'ossido di isolamento ([STI]STI](./MOS.md)) circondato dall'anello $P^+$ *Channel-Stop*.
+
+#### A) Abbattimento tramite Fingering e Condivisione delle Diffusioni
+Nei MOS di larghezza $W$ elevata, dividendo il transistor in $N$ dita parallele con sequenza interdigitata ($\mathbf{S - G - D - G - S}$):
+* I canali adiacenti **condividono la stessa sacca di Drain centrale**.
+* Il numero di sacche di Drain si **dimezza** a $N/2$.
+* **L'area totale di Drain si dimezza letteralmente**, riducendo la capacità parassita $C_{DB}$ di quasi il **$50\%$**.
+* 👉 Approfondimento dettagliato sullo *sweet spot* e sui limiti da perimetro/metallizzazioni: [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md).
+
+#### B) Comportamento in AC: Nodi a Massa vs Nodi Flottanti (Cascode e Differenziali)
+L'impatto circuitale di $C_{SB}$ e $C_{DB}$ dipende dal potenziale dinamico del nodo:
+* **Source collegato a massa/alimentazione ($v_s = 0$):** Il Source è una massa virtuale in AC. $C_{SB}$ è connessa tra massa e massa, quindi non passa corrente di segnale ed è ininfluente per la banda.
+* **Source su nodo flottante di segnale (es. Source del Cascode o nodo di coda differenziale):** Il potenziale $v_s(t)$ oscilla attivamente. La capacità $C_{SB}$ crea una perdita di corrente verso il substrato, determinando la posizione del **polo non dominante** dell'amplificatore:
+  $$\omega_{p2} \approx \frac{g_{m,\text{cascode}}}{C_{D,\text{in}} + C_{S,\text{cascode}}}$$
+  Dimezzare $C_D$ e $C_S$ tramite fingering sposta $\omega_{p2}$ a frequenze molto più elevate, preservando il **Margine di Fase** e la stabilità del circuito.
+
+👉 Per annullare completamente le giunzioni parassite verso il substrato si impiega la tecnologia [SOI (Silicon On Insulator)]SOI (Silicon On Insulator)](./SOI.md), dove l'ossido sepolto BOX isola interamente le sacche.
 
 ---
 
@@ -152,12 +168,14 @@ Transistor ACCESO in Saturazione (Vgs > Vth, Vds >= Vov):
 ---
 
 *Pagine correlate:*
-- [Famiglia Logica e Costo per Bit](../Famiglie%20Logiche/Famiglia%20Logica%20e%20Costo%20per%20Bit.md)
+- [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
 - [MOS](./MOS.md)
-- [Condensatori](./Condensatori.md)
+- [Matching e Variabilita nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)
 - [La soglia da cosa dipende](./La%20soglia%20da%20cosa%20dipende.md)
-- [Transitori del diodo e capacita](./Transitori%20del%20diodo%20e%20capacita.md)
 - [SOI](./SOI.md)
+- [Condensatori](./Condensatori.md)
+- [Transitori del diodo e capacita](./Transitori%20del%20diodo%20e%20capacita.md)
+- [Famiglia Logica e Costo per Bit](../Famiglie%20Logiche/Famiglia%20Logica%20e%20Costo%20per%20Bit.md)
 - [Difficoltà nel fare un componente ideale](../Scaling%20e%20Limiti%20Fisici/Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Rapporto Ion Ioff e sottosoglia](../Effetti%20di%20Canale%20Corto/Rapporto%20Ion%20Ioff%20e%20sottosoglia.md)
 - [DIBL](../Effetti%20di%20Canale%20Corto/DIBL.md)

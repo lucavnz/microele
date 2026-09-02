@@ -30,10 +30,11 @@ $$I_D \approx W \cdot C_{ox} \cdot v_{sat} \cdot (V_{GS} - V_{th})$$
    Aumentare la corrente di polarizzazione $I_D$ è del tutto inutile: $g_m$ resta bloccata al valore limite!
 
 2. **Crollo dell'efficienza $g_m/I_D$:**
-   L'efficienza di transconduttanza $g_m/I_D$ misura quanto guadagno ottieni per ogni milliampere di corrente speso. Nei nodi nanometrici saturi questa efficienza scende drasticamente, costringendo a sprecare potenza statica per ottenere prestazioni analogiche mediocri.
+   L'efficienza di transconduttanza $g_m/I_D$ misura quanto guadagno ottieni per ogni milliampere di corrente speso (vedi [Overdrive e Regioni di Inversione](../Dispositivi%20e%20Componenti/Overdrive%20e%20Regioni%20di%20Inversione.md)). Nei nodi nanometrici saturi questa efficienza scende drasticamente, costringendo a sprecare potenza statica per ottenere prestazioni analogiche mediocri.
 
 ---
 *Pagine correlate:*
+- [Overdrive e Regioni di Inversione](../Dispositivi%20e%20Componenti/Overdrive%20e%20Regioni%20di%20Inversione.md)
 - [Analogico non si scende di dimensioni](../Scaling%20e%20Limiti%20Fisici/Analogico%20non%20si%20scende%20di%20dimensioni.md)
 - [Crollo di ro](./Crollo%20di%20ro.md)
 - [Hot carriers](./Hot%20carriers.md)

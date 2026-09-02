@@ -20,6 +20,7 @@ Accumulazione     Banda Piatta           Svuotamento           Forte Inversione
 3. **Svuotamento e Debole Inversione ($V_{FB} < V_{GS} < V_{th}$):** Tensione positiva modesta. Le lacune vengono respinte in profondità, lasciando scoperti gli ioni accettori negativi fissi (zona di svuotamento $W_d$). I pochi elettroni all'interfaccia si muovono solo per diffusione.
    👉 Approfondimento: [Conduzione di Sottosoglia e Rapporto Ion/Ioff](../Effetti%20di%20Canale%20Corto/Rapporto%20Ion%20Ioff%20e%20sottosoglia.md)
 4. **Forte Inversione ($V_{GS} > V_{th}$):** La concentrazione di elettroni alla superficie supera il drogaggio originario ($n(0) \ge N_A$). Si forma uno strato sottilissimo e denso di elettroni liberi (carica mobile $Q_i$): **il canale conduce corrente**.
+   👉 Approfondimento su Overdrive, Saturazione ed Efficienza: [Overdrive e Regioni di Inversione](./Overdrive%20e%20Regioni%20di%20Inversione.md)
 
 ---
 
@@ -76,7 +77,29 @@ All'aumentare di $V_{SB}$, la tensione di soglia $V_{th}$ **aumenta**.
 
 ---
 
-### 5. Cosa succede quando scendiamo di dimensioni? (Effetti 2D/3D)
+### 5. La Deriva Termica della Soglia $V_{th}(T)$
+
+All'aumentare della temperatura $T$, la concentrazione intrinseca $n_i(T)$ cresce in modo esponenziale:
+$$n_i(T) \propto T^{3/2} \, e^{-\frac{E_g}{2 k_B T}}$$
+
+Poiché il potenziale di Fermi vale $\Phi_F(T) = \frac{k_B T}{q} \ln\left(\frac{N_A}{n_i(T)}\right)$, all'aumentare di $T$ il potenziale $\Phi_F$ **cala vistosamente** (il livello di Fermi $E_F$ si sposta verso il centro del gap $E_i$). Per raggiungere la forte inversione serve meno curvatura di banda superficiale ($2\Phi_F$) e una minore carica fissa di svuotamento $Q_{d,MAX}$.
+
+* **Transistor nMOS:** $\frac{\partial V_{Tn}}{\partial T} \approx -1\text{ mV/K}$ (la soglia scende).
+* **Transistor pMOS:** $\frac{\partial V_{Tp}}{\partial T} \approx +2\text{ mV/K}$ (la soglia sale verso 0 V).
+* **Conclusione:** **In modulo $|V_{th}|$ cala per entrambi i tipi di transistor**, che diventano più conduttivi e facili da accendere alle alte temperature.
+
+---
+
+### 6. L'Effetto Body nelle Serie di Transistor e nel Folded MOS
+
+Quando transistor MOS sono posti in serie (come nelle catene di pull-down delle porte logiche NAND o nei transistor lunghi ripiegati [Folded MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)):
+* Il dispositivo con Source a massa ha $V_{SB1} = 0\text{ V}$ e soglia nominale $V_{th0}$.
+* I transistor sovrastanti vedono il proprio Source a tensioni via via crescenti ($V_S > 0\text{ V}$), imponendo **$V_{SB} > 0\text{ V}$**.
+* **La soglia $V_{th}$ aumenta progressivamente salendo verso il Drain**, riducendo la corrente e aumentando la resistenza dinamica di canale.
+
+---
+
+### 7. Cosa succede quando scendiamo di dimensioni? (Effetti 2D/3D)
 
 La formula classica monodimensionale a canale lungo assume che $V_{th}$ non dipenda né da $W$ né da $L$. Nei dispositivi nanometrici reali intervengono invece:
 
@@ -89,9 +112,16 @@ La formula classica monodimensionale a canale lungo assume che $V_{th}$ non dipe
 ---
 
 *Pagine correlate:*
+- [Overdrive e Regioni di Inversione](./Overdrive%20e%20Regioni%20di%20Inversione.md)
+- [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
 - [MOS](./MOS.md)
+- [Capacità parassite nel MOSFET](./Capacit%C3%A0%20parassite%20nel%20MOSFET.md)
+- [Matching e Variabilita nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)
 - [Condensatori](./Condensatori.md)
 - [Vth Roll-Off](../Effetti%20di%20Canale%20Corto/Vth%20roll%20off.md)
 - [DIBL](../Effetti%20di%20Canale%20Corto/DIBL.md)
 - [Conduzione di Sottosoglia e Rapporto Ion/Ioff](../Effetti%20di%20Canale%20Corto/Rapporto%20Ion%20Ioff%20e%20sottosoglia.md)
 - [Analogico non si scende di dimensioni](../Scaling%20e%20Limiti%20Fisici/Analogico%20non%20si%20scende%20di%20dimensioni.md)
+
+
+

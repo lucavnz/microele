@@ -110,6 +110,7 @@ L'impatto di `NARROW` è tanto più devastante quanto più la pista è stretta:
 ---
 
 *Pagine correlate:*
+- [Matching e Variabilita nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)
 - [Resistore](./Resistore.md)
 - [Difficoltà nel fare un componente ideale](../Scaling%20e%20Limiti%20Fisici/Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Induttore](./Induttore.md)

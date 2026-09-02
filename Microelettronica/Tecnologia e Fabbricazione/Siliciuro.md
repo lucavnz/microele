@@ -31,10 +31,13 @@ La probabilità che gli elettroni attraversino la barriera per **effetto tunnel*
 $$R_c \propto \exp\left( \frac{2\sqrt{\varepsilon_{si} m^*}}{\hbar} \cdot \frac{\Phi_B}{\sqrt{N_D}} \right)$$
 
 Il forte drogaggio stringe la barriera e il siliciuro ne riduce l'altezza: la loro combinazione trasforma il contatto in un **contatto ohmico perfetto** con resistenza specifica trascurabile ($R_c < 10^{-8}\,\Omega\cdot\text{cm}^2$).
+👉 Approfondimento: [Contatti Ohmici e Giunzioni High-Low](../Dispositivi%20e%20Componenti/Contatti%20Ohmici%20e%20Giunzioni%20High-Low.md).
 
 ---
 
 *Pagine correlate:*
+- [Contatti Ohmici e Giunzioni High-Low](../Dispositivi%20e%20Componenti/Contatti%20Ohmici%20e%20Giunzioni%20High-Low.md)
+- [Diodo PIN e Modulazione di Conducibilita](../Dispositivi%20e%20Componenti/Diodo%20PIN%20e%20Modulazione%20di%20Conducibilita.md)
 - [Vias](./Vias.md)
 - [Elettromigrazione e tossicità dei metalli](./Elettromigrazione%20e%20tossicit%C3%A0%20dei%20metalli.md)
 - [Resistore](../Dispositivi%20e%20Componenti/Resistore.md)

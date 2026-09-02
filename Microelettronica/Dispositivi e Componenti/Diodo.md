@@ -194,15 +194,17 @@ Nel flusso CMOS standard, il diodo viene ricavato all'interno di una $n\text{-we
 1. **La Giunzione $p^+ - n^-$ asimmetrica:**
    La giunzione attiva vera e propria è formata tra la sacca fortemente drogata $p^+$ (Anodo) e la $n\text{-well}$ poco drogata $n^-$.
    Poiché $N_A (p^+) \gg N_D (n\text{-well})$, la regione di svuotamento si estende quasi al $100\%$ all'interno della $n\text{-well}$ ($W \propto \sqrt{1/N_D}$).
-2. **Il ruolo della sacca $n^+$ (Contatto Ohmico):**
+2. **Il ruolo della sacca $n^+$ (Contatto Ohmico e Giunzione High-Low):**
    Non serve a creare una seconda giunzione, ma a garantire un **contatto ohmico a bassa resistenza con il metallo del Catodo**:
    * Se appoggiassimo il metallo direttamente sul silicio poco drogato della $n\text{-well}$, si formerebbe una barriera Schottky rettificante (un **diodo Schottky parassita** che bloccherebbe la corrente!).
    * L'iper-drogaggio $n^+$ rende la barriera metallo-silicio così sottile da essere scavalcata per **effetto tunnel** quantistico, azzerando la resistenza di contatto.
+   👉 Approfondimento: [Contatti Ohmici e Giunzioni High-Low](./Contatti%20Ohmici%20e%20Giunzioni%20High-Low.md).
 3. **Differenza rispetto a un vero Diodo PIN ($P-I-N$):**
    In un diodo PIN lo strato centrale è **silicio intrinseco (non drogato)** molto spesso:
    * **Capacità parassita $C_j \to 0$:** avendo $W$ grande, azzera la capacità per **interruttori e attenuatori RF/microonde**.
    * **Fotodiodi PIN:** la zona $I$ fa da enorme volume di cattura per generare coppie ottiche con la luce.
-   * **Altissima tensione:** sopporta migliaia di Volt senza rottura.
+   * **Altissima tensione:** sopporta migliaia di Volt senza rottura grazie al campo elettrico costante rettangolare e alla modulazione di conducibilità.
+   👉 Approfondimento: [Diodo PIN e Modulazione di Conducibilita](./Diodo%20PIN%20e%20Modulazione%20di%20Conducibilita.md).
    Nel CMOS standard, la $n\text{-well}$ è invece semplicemente poco drogata ($n^-$), realizzando un diodo $p^+-n$ asimmetrico.
 
 ---
@@ -250,6 +252,8 @@ Nei circuiti analogici di precisione si preferisce realizzare il diodo prendendo
 ---
 
 *Pagine correlate:*
+- [Diodo PIN e Modulazione di Conducibilita](./Diodo%20PIN%20e%20Modulazione%20di%20Conducibilita.md)
+- [Contatti Ohmici e Giunzioni High-Low](./Contatti%20Ohmici%20e%20Giunzioni%20High-Low.md)
 - [DTL (Diode-Transistor Logic)](../Famiglie%20Logiche/DTL%20%28Diode-Transistor%20Logic%29.md)
 - [TTL (Transistor-Transistor Logic)](../Famiglie%20Logiche/TTL%20%28Transistor-Transistor%20Logic%29.md)
 - [HTL (High-Threshold Logic)](../Famiglie%20Logiche/HTL%20%28High-Threshold%20Logic%29.md)

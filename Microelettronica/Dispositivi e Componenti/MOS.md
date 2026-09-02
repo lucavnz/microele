@@ -48,7 +48,59 @@ Per questo si è passati alla **STI** (*Shallow Trench Isolation*):
 
 ---
 
+### 5. Sezione Trasversale Bulk CMOS: STI, Svuotamento e Channel-Stop $P^+$
+
+Nella struttura reale a canale corto:
+* Le diffusioni $N^+$ di Source e Drain sbattono **a filo contro la parete verticale dell'ossido STI** (profondo $0.4\,\mu\text{m} > x_j = 0.2\,\mu\text{m}$).
+* Alla base della trincea viene impiantato un anello **$P^+$ Channel-Stop** per evitare canali parassiti di inversione e correnti di fuga tra dispositivi adiacenti.
+
+![Struttura Bulk CMOS con STI e Channel-Stop](../../Immagini/mos_sti_bulk_cross_section.png)
+
+Le capacità parassite di giunzione si scompongono in:
+* **Capacità di fondo ($C_{\text{bottom}}$):** $C_{\text{bottom}} = c_j \cdot (W \cdot L_D)$
+* **Capacità di perimetro/pareti ($C_{\text{sidewall}}$):** $C_{\text{sidewall}} = c_{jsw} \cdot (2W + 2L_D)$
+
+---
+
+### 6. Layout del MOS Largo: Fingering e Condivisione delle Diffusioni
+
+Nei MOS con larghezza $W$ elevata ($W \gg L$):
+* Una singola striscia continua presenta una **resistenza distribuita di Gate $R_G$ enorme** ($R_G = R_\square \frac{W}{L}$) e un'area di Drain estesa su tutta la larghezza.
+* **La tecnica del Fingering:** spezzando il canale in $N$ dita parallele interdigitate ($\mathbf{S - G - D - G - S}$), **la resistenza di Gate crolla di $N^2$ volte** ($R_{G,\text{tot}} = R_G / N^2$) e le dita condividono le sacche di Drain interne, **dimezzando l'area totale di Drain e la capacità parassita $C_{DB}$**!
+
+![Confronto Layout Singolo Dito vs Interdigitato](../../Immagini/mos_fingering_layout_comparison.png)
+
+👉 Approfondimento completo sulle regole di layout, lo *sweet spot* contro i perimetri STI e il matching: [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
+
+---
+
+### 7. Layout del MOS Lungo: "Folded MOS" ed Effetto Body
+
+Quando si richiedono canali molto lunghi ($W/L \ll 1$) per correnti bassissime o altissime resistenze equivalenti, il transistor viene ripiegato a serpentina (**Folded MOS**) sotto un unico piano di Gate.
+* Nelle connessioni in serie dei canali, i nodi intermedi salgono a potenziale positivo ($V_{\text{nodo}} > 0\text{ V}$), imponendo **$V_{SB} > 0\text{ V}$** per tutti i transistor superiori.
+* Per l'**Effetto Body**, la soglia $V_T$ **aumenta progressivamente salendo verso il Drain**, riducendo la corrente efficace erogata.
+
+---
+
+### 8. L'Isolamento Totale: Tecnologia SOI (*Silicon-On-Insulator*)
+
+In tecnologia SOI il silicio attivo massivo è sostituito da un sottile film appoggiato sopra un ossido sepolto (**BOX - *Buried Oxide***):
+
+![Tecnologia SOI con BOX](../../Immagini/mos_soi_cross_section.png)
+
+* Le pareti laterali STI e il fondo toccano solo biossido di silicio.
+* **Le capacità parassite di giunzione $pn$ verso il substrato sono pari a ZERO.**
+* 👉 Approfondimento: [SOI (Silicon On Insulator)](./SOI.md)
+
+---
+
 *Pagine correlate:*
+- [Overdrive e Regioni di Inversione](./Overdrive%20e%20Regioni%20di%20Inversione.md)
+- [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
+- [Capacità parassite nel MOSFET](./Capacit%C3%A0%20parassite%20nel%20MOSFET.md)
+- [Matching e Variabilita nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)
+- [La soglia da cosa dipende](./La%20soglia%20da%20cosa%20dipende.md)
+- [SOI](./SOI.md)
 - [Famiglia Logica e Costo per Bit](../Famiglie%20Logiche/Famiglia%20Logica%20e%20Costo%20per%20Bit.md)
 - [Caratteristica di Trasferimento e Rigenerazione](../Famiglie%20Logiche/Caratteristica%20di%20Trasferimento%20e%20Rigenerazione.md)
 - [Soglia Logica e Margine di Rumore](../Famiglie%20Logiche/Soglia%20Logica%20e%20Margine%20di%20Rumore.md)
@@ -64,4 +116,3 @@ Per questo si è passati alla **STI** (*Shallow Trench Isolation*):
 - [Difficoltà nel fare un componente ideale](../Scaling%20e%20Limiti%20Fisici/Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Resistore](./Resistore.md)
 - [Condensatori](./Condensatori.md)
-- [La soglia da cosa dipende](./La%20soglia%20da%20cosa%20dipende.md)

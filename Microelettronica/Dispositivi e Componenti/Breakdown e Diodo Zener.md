@@ -66,6 +66,8 @@ Tensione di rottura:   V_BR < 4 V                           V_BR > 6 V
 #### B. Moltiplicazione a Valanga (*Impact Ionization*, $V_{BR} > 6\text{ V}$)
 * **Dove avviene:** in giunzioni con drogaggio medio o basso (zona svuotata $W$ più larga).
 * **Fisica del fenomeno:** la barriera è troppo spessa perché le cariche possano compiere il salto quantistico. Tuttavia, gli elettroni della debole corrente inversa hanno molto spazio per accelerare sotto l'azione del campo elettrico. Quando acquistano energia cinetica $E_{cin} \ge 1.5 E_g$, **urtano violentemente gli atomi del reticolo**, scalzando elettroni di valenza e generando nuove coppie elettrone-lacuna. I nuovi portatori accelerano a loro volta creando una reazione a catena (*moltiplicazione a valanga* con coefficiente $M \to \infty$).
+* **Profilo di Campo e Breakdown (PN Triangolare vs PIN Rettangolare):**  
+  Nella giunzione $PN$ la carica fissa degli ioni impone un profilo di campo elettrico **triangolare**, con tensione di rottura pari all'area $V_{BR} = \frac{1}{2}\mathcal{E}_{crit} W$. Nel diodo [PIN](./Diodo%20PIN%20e%20Modulazione%20di%20Conducibilita.md), l'assenza di cariche fisse nella regione $I$ genera un campo **rettangolare costante**, raddoppiando la tensione di tenuta ($V_{BR} = \mathcal{E}_{crit} W$).
 * **Effetto Curvatura 2D (*Junction Curvature*):** nei diodi planari integrati, la diffusione laterale sotto l'ossido crea bordi curvi ($r_j$). Le linee di campo elettrico convergono sugli spigoli per effetto punta, facendo scattare la valanga a una tensione inferiore rispetto al caso teorico 1D ($V_{BR, 2D} < V_{BR, 1D}$).
   👉 Vedi: [Diodo](./Diodo.md) (Sezione Effetti di Seconda Dimensione).
 
@@ -89,6 +91,8 @@ Nelle famiglie logiche industriali come l'[HTL (High-Threshold Logic)](../Famigl
 ---
 
 *Pagine correlate:*
+- [Diodo PIN e Modulazione di Conducibilita](./Diodo%20PIN%20e%20Modulazione%20di%20Conducibilita.md)
+- [Contatti Ohmici e Giunzioni High-Low](./Contatti%20Ohmici%20e%20Giunzioni%20High-Low.md)
 - [HTL (High-Threshold Logic)](../Famiglie%20Logiche/HTL%20%28High-Threshold%20Logic%29.md)
 - [Diodo](./Diodo.md)
 - [BJT](./BJT.md)

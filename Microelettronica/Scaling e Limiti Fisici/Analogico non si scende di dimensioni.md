@@ -51,6 +51,9 @@ Mentre l'analogico soffre drammaticamente la riduzione delle dimensioni per perd
 ---
 
 *Pagine correlate:*
+- [Matching e Variabilita nei Componenti Integrati](../Dispositivi%20e%20Componenti/Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)
+- [Resistore](../Dispositivi%20e%20Componenti/Resistore.md)
+- [Condensatori](../Dispositivi%20e%20Componenti/Condensatori.md)
 - [Famiglia Logica e Costo per Bit](../Famiglie%20Logiche/Famiglia%20Logica%20e%20Costo%20per%20Bit.md)
 - [Caratteristica di Trasferimento e Rigenerazione](../Famiglie%20Logiche/Caratteristica%20di%20Trasferimento%20e%20Rigenerazione.md)
 - [Soglia Logica e Margine di Rumore](../Famiglie%20Logiche/Soglia%20Logica%20e%20Margine%20di%20Rumore.md)
