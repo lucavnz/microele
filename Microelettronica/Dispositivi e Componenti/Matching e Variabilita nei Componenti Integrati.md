@@ -186,3 +186,4 @@ Anche se il polisilicio è depositato sopra l'ossido e non nel silicio monocrist
 - [Difficoltà nel fare un componente ideale](../Scaling%20e%20Limiti%20Fisici/Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Siliciuro](../Tecnologia%20e%20Fabbricazione/Siliciuro.md)
 - [Wafer produzione](../Tecnologia%20e%20Fabbricazione/Wafer%20produzione.md)
+- [Confronto Tecnologie CMOS e BiCMOS](../Tecnologia%20e%20Fabbricazione/Confronto%20Tecnologie%20CMOS%20e%20BiCMOS.md)

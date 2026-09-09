@@ -223,9 +223,12 @@ L'introduzione del Level Restorer non è gratuita e impone vincoli dimensionali 
 | **PTL + Level Restorer** | Basso ($N + 1$ per porta) | **Piena ($V_{DD}$ Rail-to-Rail)** | **Zero (A regime stazionario)** | **Ottimo** | **Sì ($M_r$ debole)** |
 | **Transmission Gate (TG)** | Medio ($2N$: nMOS + pMOS) | **Piena ($V_{DD}$ Rail-to-Rail)** | **Zero** | **Ottimo** | No (Interruttore simmetrico) |
 
+👉 Approfondimento sul funzionamento del Transmission Gate e dei latch statici: [Bistabilità, Metastabilità e Latch Statici](../Circuiti%20Sequenziali%20CMOS/Bistabilit%C3%A0,%20Metastabilit%C3%A0%20e%20Latch%20Statici.md).
+
 ---
 
 *Pagine correlate:*
+- [Bistabilità, Metastabilità e Latch Statici](../Circuiti%20Sequenziali%20CMOS/Bistabilit%C3%A0,%20Metastabilit%C3%A0%20e%20Latch%20Statici.md)
 - [Ratioed Logic e DCVSL](./Ratioed%20Logic%20e%20DCVSL.md)
 - [Dimensionamento Transistor e Ritardo di Pattern (Sizing)](./Dimensionamento%20Transistor%20e%20Ritardo%20di%20Pattern%20(Sizing).md)
 - [Effetto di Fan-In e Fan-Out sul Ritardo (Elmore)](./Effetto%20di%20Fan-In%20e%20Fan-Out%20sul%20Ritardo%20(Elmore).md)

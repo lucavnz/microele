@@ -32,6 +32,7 @@ In un chip digitale con miliardi di porte logiche, gli NMOS condividono il comun
 #### B. Quando si usano le Sacche Isolate (Triple-Well)?
 * **Circuiti a Segnale Misto (Analogico/Digitale/RF):** per schermare transistor analogici ad altissima sensibilità (es. LNA, ADC) dal rumore ad alta frequenza generato dai blocchi digitali sul substrato.
 * **Eliminazione dell'Effetto Body ($V_{SB} = 0$):** in configurazioni a transistori impilati (*cascode*, *source-follower* o interruttori di trasmissione), collegando localmente il Source al proprio Bulk dedicato ($V_{SB}=0$) si mantiene la tensione di soglia $V_{th}$ costante e indipendente dal livello di segnale.
+* 👉 Per il confronto dettagliato di compattezza di layout, matching e costi tra Bulk, Triple-Well, SOI e BiCMOS: [Confronto Tecnologie CMOS e BiCMOS](./Confronto%20Tecnologie%20CMOS%20e%20BiCMOS.md).
 
 ---
 
@@ -151,3 +152,4 @@ Per garantire che $\beta_{NPN} \cdot \beta_{PNP} < 1$ e che le cadute ohmiche no
 - [Elettromigrazione e tossicità dei metalli](./Elettromigrazione%20e%20tossicit%C3%A0%20dei%20metalli.md)
 - [Difficoltà nel fare un componente ideale](../Scaling%20e%20Limiti%20Fisici/Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Integrati protetti da interferenze](../Scaling%20e%20Limiti%20Fisici/Integrati%20protetti%20da%20interferenze.md)
+- [Confronto Tecnologie CMOS e BiCMOS](./Confronto%20Tecnologie%20CMOS%20e%20BiCMOS.md)

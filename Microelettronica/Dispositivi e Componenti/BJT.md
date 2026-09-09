@@ -58,18 +58,53 @@ Lo spessore della base $W_B$ è il parametro più critico di tutto il transistor
 
 ### 3. BJT Verticale vs BJT Laterale (Perché vince il Verticale?)
 
-Nelle tecnologie planari sul silicio il transistore bipolare può essere orientato in due modi:
+Nelle tecnologie planari sul silicio (BiCMOS) il transistore bipolare può essere realizzato in due configurazioni strutturali:
 
-![BiCMOS Fake vs Real e BJT Verticale vs Laterale](../../Immagini/bicmos_fake_vs_real.png)
+```
+A) BJT NPN VERTICALE:
+       S          C          B          E          B          C
+       │          │          │          │          │          │
+   ┌───┴───┐  ┌───┴───┐  ┌───┴───┐  ┌───┴───┐  ┌───┴───┐  ┌───┴───┐
+   │  p+   │  │  n+   │  │   p   │  │  n+   │  │   p   │  │  n+   │
+   └───────┘  └───┬───┘  └───┬───┘  └───┬───┘  └───┬───┘  └───┬───┘
+                  │          │          │          │          │
+                  │          └──────────┼──────────┘          │
+                  │               Base p superficiale          │
+                  │                     │                     │
+                  └──────────────► Pozzo n- (Collettore) ◄─────┘
+                  ┌───────────────────────────────────────────┐
+                  │          n+ Buried Layer (Autostrada)     │
+                  └───────────────────────────────────────────┘
+                               Substrato p (S)
 
-1. **BJT Verticale (Il Vincitore assoluto):**
-   * **Flusso cariche:** dall'alto verso il basso (perpendicolare alla superficie).
+B) BJT PNP LATERALE:
+       S          B          C          E          C          B
+       │          │          │          │          │          │
+   ┌───┴───┐  ┌───┴───┐  ┌───┴───┐  ┌───┴───┐  ┌───┴───┐  ┌───┴───┐
+   │  p+   │  │  n+   │  │   p   │  │   p   │  │   p   │  │  n+   │
+   └───────┘  └───┬───┘  └───┬───┘  └───┬───┘  └───┬───┘  └───┬───┘
+                  │       Collettore   Emettitore Collettore   │
+                  │            │            │          │       │
+                  │            └──────◄ ◄ ──┴── ► ► ───┘       │
+                  │               Corrente laterale            │
+                  └──────────────►  Pozzo n- (Base)  ◄─────────┘
+                  ┌───────────────────────────────────────────┐
+                  │          n+ Buried Layer (Schermo)        │
+                  └───────────────────────────────────────────┘
+                               Substrato p (S)
+```
+
+1. **BJT NPN Verticale (Il Vincitore assoluto):**
+   * **Flusso cariche:** dall'alto verso il basso (perpendicolare alla superficie) attraverso la Base $p$ fino al Collettore $n^-$.
    * **Controllo dello spessore $W_B$:** è determinato dalla differenza di profondità tra l'impianto ionico di base e quello di emettitore, regolato termicamente nei forni di diffusione.
    * Si possono realizzare basi spesse **poche decine di nanometri con precisione atomica**, ottenendo $\tau_F$ minuscolo, altissima frequenza $f_T$ ed elevato guadagno $\beta$.
-2. **BJT Laterale:**
-   * **Flusso cariche:** orizzontale (di lato, lungo la superficie del wafer).
-   * **Controllo dello spessore $W_B$:** è fissato dalla **distanza fotolitografica tra le maschere** ($\lambda$).
-   * La risoluzione delle maschere superficiali è molto più grezza rispetto alla profondità di diffusione: la base è inevitabilmente larga $\implies$ tempo di transito lungo, molta ricombinazione, velocità limitata e basso guadagno $\beta$.
+   * **Strato sepolto ($n^+$ buried layer):** fa da "autostrada" a resistenza quasi nulla per raccogliere gli elettroni e deviarli verso i contatti $C$, abbattendo $R_C$.
+2. **BJT PNP Laterale:**
+   * **Flusso cariche:** orizzontale/laterale tra l'Emettitore centrale ($p$) e il Collettore circostante ($p$) attraverso la Base ($n\text{-well}$).
+   * **Controllo dello spessore $W_B$:** è fissato dalla **distanza fotolitografica tra le maschere** ($\lambda$). La base è inevitabilmente più larga rispetto a quella verticale $\implies$ tempo di transito più lungo, maggior ricombinazione e guadagno $\beta$ più modesto.
+   * **Ruolo dello strato sepolto ($n^+$ buried layer):** agisce da **schermo elettrostatico**: impedisce alle lacune dell'Emettitore di essere iniettate verticalmente nel substrato $p$, sopprimendo il parassita verticale verso massa.
+
+👉 Per il confronto globale tra le tecnologie: [Confronto Tecnologie CMOS e BiCMOS](../Tecnologia%20e%20Fabbricazione/Confronto%20Tecnologie%20CMOS%20e%20BiCMOS.md).
 
 ---
 
@@ -123,3 +158,4 @@ Cortocircuitando Base e Collettore ($V_{BC} = 0$), il BJT si comporta come un [D
 - [Condensatori](./Condensatori.md)
 - [Analogico non si scende di dimensioni](../Scaling%20e%20Limiti%20Fisici/Analogico%20non%20si%20scende%20di%20dimensioni.md)
 - [Rapporto Ion Ioff e sottosoglia](../Effetti%20di%20Canale%20Corto/Rapporto%20Ion%20Ioff%20e%20sottosoglia.md)
+- [Confronto Tecnologie CMOS e BiCMOS](../Tecnologia%20e%20Fabbricazione/Confronto%20Tecnologie%20CMOS%20e%20BiCMOS.md)

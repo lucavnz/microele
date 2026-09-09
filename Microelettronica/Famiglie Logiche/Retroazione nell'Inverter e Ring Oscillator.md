@@ -68,11 +68,24 @@ Il fronte logico deve attraversare l'intera catena di $N$ stadi per **due volte 
 $$T = 2 \cdot N \cdot t_p$$
 $$f = \frac{1}{2 \cdot N \cdot t_p}$$
 
+#### Cosa cambia tra TANTI inverter e POCHI inverter?
+
+| Parametro | POCHI inverter (es. $N = 3$) | TANTI inverter (es. $N = 31, 65, 101$) |
+| :--- | :--- | :--- |
+| **Frequenza di oscillazione** | **Altissima** (decine di GHz) | **Moderata / Bassa** (decine/centinaia di MHz) |
+| **Periodo $T$** | Brevissimo | Molto lungo |
+| **Forma d'onda** | Rischia di essere smussata (quasi sinusoidale) | **Onda quadra perfetta rail-to-rail** ($0\text{ V} \leftrightarrow V_{DD}$) |
+| **Stabilità di oscillazione** | Più sensibile al guadagno | **Robustissima** |
+
+* **Perché $N = 1$ non oscilla e $N = 3$ è il minimo fisico:**  
+  Un singolo invertitore con uscita collegata all'ingresso non ha uno sfasamento di fase sufficiente a soddisfare il criterio di Barkhausen prima che il guadagno cali: finisce per "sedersi" a riposo sul punto statico $V_M \approx V_{DD}/2$. Con $N = 3$ (tre stadi con polo RC che introducono ciascuno $60^\circ$ di ritardo oltre all'inversione) si raggiunge lo sfasamento necessario per innescare l'oscillazione permanente.
+* **Forma d'onda piena:** con una catena lunga, il fronte ha tutto il tempo di saturare completamente a massa e ad alimentazione prima dell'arrivo della transizione successiva, eliminando incertezze logiche.
+
 > [!TIP]
-> **Come si misura il ritardo $t_p$ sul silicio?**  
+> **Lo strumento industriale "Process Monitor" (Test Chip):**  
 > Misurare direttamente il ritardo $t_p$ di una singola porta logica (spesso dell'ordine di $10\text{ ps}$) è tecnicamente impossibile con strumenti esterni a causa delle capacità parassite delle sonde.  
-> Nei chip di test si realizza un Ring Oscillator con molti stadi (es. $N = 31$ o $N = 101$): il circuito oscilla a una frequenza comodamente misurabile con un frequenzimetro e da $f$ si ricava il tempo medio di commutazione della tecnologia:
-> $$t_p = \frac{1}{2 \cdot N \cdot f}$$
+> Fonderie come TSMC o Intel inseriscono sui wafer un Ring Oscillator con **$N = 101$ stadi**: la frequenza scende a valori comodamente leggibili con un normale frequenzimetro (es. $50\text{ MHz}$) e da essa si estrae con precisione assoluta il ritardo medio del singolo transistor della tecnologia:
+> $$t_p = \frac{T}{2 \cdot N} = \frac{1}{2 \cdot N \cdot f}$$
 
 ---
 
@@ -85,11 +98,38 @@ La tipologia di circuito dipende unicamente dal fatto che il numero di inversion
 | **$N$ Dispari ($1, 3, 5\dots$)** | Retroazione **negativa con ritardo** | Il circuito non ha punti stabili estremi e **oscilla continuamente**. | **Ring Oscillator** (generazione di clock, test $t_p$). |
 | **$N$ Pari ($2, 4\dots$)** | Retroazione **positiva (rigenerativa)** | Il segnale si blocca in uno dei due stati ($0$ o $1$) rinforzandosi da solo. | **Bistabile / Cella SRAM** (memoria statica). |
 
-👉 Approfondimento sulla rigenerazione degli stati stabili: [Caratteristica di Trasferimento e Rigenerazione](./Caratteristica%20di%20Trasferimento%20e%20Rigenerazione.md).
+👉 Approfondimento sulla memoria statica, la bistabilità e la metastabilità: [Bistabilità, Metastabilità e Latch Statici](../Circuiti%20Sequenziali%20CMOS/Bistabilit%C3%A0,%20Metastabilit%C3%A0%20e%20Latch%20Statici.md).  
+👉 Approfondimento sulla rigenerazione dei livelli logici: [Caratteristica di Trasferimento e Rigenerazione](./Caratteristica%20di%20Trasferimento%20e%20Rigenerazione.md).
 
 ---
 
-### 5. Unilateralità e Retroazioni Parassite Indesiderate
+### 5. Multivibratori e Altri Generatori di Clock
+
+Nel panorama dei circuiti sequenziali, i multivibratori si classificano in tre categorie (metafora dell'altalena):
+
+```
+    BISTABILE (Flip-Flop)            MONOSTABILE (One-Shot)            ASTABILE (Oscillatore)
+    
+       S              R                     T
+       ▼              ▼                     ▼
+      ══════▲══════════                    ══════▲══════════                 ══════▲══════════
+    (2 posizioni stabili:                (1 stato stabile:                 (Nessuno stato stabile:
+     memorizza 0 o 1)                     la molla lo richiama)             molle sui due lati, oscilla!)
+```
+
+1. **Monostabili (One-Shot):**  
+   Possiedono un solo stato stabile. Un impulso di trigger li porta temporaneamente nello stato instabile per un tempo prefissato $t_d$ (determinato da una linea di ritardo logica o da una rete $RC$, con $t_d \propto RC$), dopodiché il circuito torna da solo allo stato di riposo.
+2. **Oscillatore a Rilassamento (Relaxation Oscillator):**  
+   Due invertitori con retroazione tramite resistenza $R$ e capacità $C$. Il condensatore si carica e scarica ciclicamente attraverso $R$, con periodo legato ai componenti passivi:
+   $$T = 2 \ln(3) \cdot RC \approx 2.2 \cdot RC$$
+3. **VCO (Voltage-Controlled Oscillator):**  
+   Permette di variare la frequenza di oscillazione agendo su una tensione di controllo continua $V_{contr}$.
+   * Si utilizza un **Current-Starved Inverter** (inverter a corrente affamata): transistor ausiliari limitano la corrente $I_{ref}$ di carica/scarica del nodo in base a $V_{contr}$, variando a comando il ritardo $t_p$.
+   * **Il ruolo dello Schmitt Trigger a valle:** poiché la corrente limitata rende le transizioni di tensione lentissime (rampe "mosce"), lo Schmitt Trigger con la sua soglia a isteresi **ripristina la ripidità dei fronti (*restores signal slopes*)**, rigenerando un'onda quadra netta a basso consumo statico.
+
+---
+
+### 6. Unilateralità e Retroazioni Parassite Indesiderate
 
 Nelle specifiche ideali delle famiglie logiche si richiede che le porte siano **unilaterali** (Slide 5 di [famiglie.pdf](../../famiglie.pdf)):
 
@@ -100,10 +140,12 @@ Nelle specifiche ideali delle famiglie logiche si richiede che le porte siano **
 ---
 
 *Pagine correlate:*
-- [Effetto Miller](../Dispositivi%20e%20Componenti/Effetto%20Miller.md)
+- [Bistabilità, Metastabilità e Latch Statici](../Circuiti%20Sequenziali%20CMOS/Bistabilit%C3%A0,%20Metastabilit%C3%A0%20e%20Latch%20Statici.md)
+- [Logica Sequenziale e Temporizzazione](../Circuiti%20Sequenziali%20CMOS/Logica%20Sequenziale%20e%20Temporizzazione.md)
+- [Caratteristica di Trasferimento e Rigenerazione](./Caratteristica%20di%20Trasferimento%20e%20Rigenerazione.md)
 - [Inverter CMOS e Regioni di Funzionamento](./Inverter%20CMOS%20e%20Regioni%20di%20Funzionamento.md)
 - [Soglia Logica e Margine di Rumore](./Soglia%20Logica%20e%20Margine%20di%20Rumore.md)
-- [Caratteristica di Trasferimento e Rigenerazione](./Caratteristica%20di%20Trasferimento%20e%20Rigenerazione.md)
+- [Effetto Miller](../Dispositivi%20e%20Componenti/Effetto%20Miller.md)
 - [RTL e Prodotto Ritardo-Consumo (PDP)](./RTL%20e%20Prodotto%20Ritardo-Consumo%20%28PDP%29.md)
 - [Potenza Dinamica e Dissipazione di Carica](./Potenza%20Dinamica%20e%20Dissipazione%20di%20Carica.md)
 - [Capacità parassite nel MOSFET](../Dispositivi%20e%20Componenti/Capacit%C3%A0%20parassite%20nel%20MOSFET.md)

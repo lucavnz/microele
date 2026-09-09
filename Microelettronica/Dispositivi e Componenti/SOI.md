@@ -14,8 +14,18 @@ Il principio chiave consiste nell'introdurre uno strato continuo di ossido isola
    * Nel bulk il volume include tutti i pozzetti profondi micrometri nel substrato; in SOI il volume è confinato al solo sottilissimo film attivo ($W \cdot L \cdot t_{\text{Si}}$), abbattendo $I_{\text{gen}}$ di ordini di grandezza.
    * *Dove scorre la generazione in FD-SOI?* A transistor spento ($V_D = V_{DD}$, $V_S = 0\,\text{V}$), gli elettroni generati vanno al Drain e le lacune al Source: la corrente scorre **esclusivamente tra Drain e Source** come frazione trascurabile di $I_{\text{OFF}}$, mentre verso il substrato è rigorosamente **$0\,\text{A}$**.
 3. **Crollo delle Capacità Parassite di Giunzione ($C_{db}, C_{sb}$):**
-   * Il dielettrico del BOX è biossido di silicio ($\epsilon_{SiO2} \approx 3.9$), che ha una costante dielettrica **3 volte inferiore rispetto al silicio** ($\epsilon_{Si} \approx 11.7$).
-   * Le capacità parassite verso il fondo crollano del $70-80\%$, aumentando drasticamente la velocità di commutazione dei circuiti e abbattendo l'accoppiamento di rumore in AC.
+   * **La costante dielettrica:** Il BOX è biossido di silicio ($\varepsilon_{SiO_2} \approx 3.9 \cdot \varepsilon_0$), che ha una permittività **3 volte inferiore rispetto al silicio** ($\varepsilon_{Si} \approx 11.7 \cdot \varepsilon_0$). A parità di geometria, la capacità $C = \frac{\varepsilon A}{d}$ è già divisa per 3.
+   * **L'area reale non è "tutto il chip":** Anche se l'ossido sepolto si estende su tutto il wafer, l'armatura superiore del condensatore è **esclusivamente la minuscola area del singolo pozzetto di Drain o Source** (frazioni di micrometro quadro, es. $W \cdot L_D \approx 0.05\,\mu\text{m}^2$). Ciascun transistor è fisicamente ritagliato e isolato lateralmente da trincee STI.
+   * **Azzeramento delle pareti laterali ($C_{\text{sidewall}}$):** Nel silicio bulk la sacca di Drain è una vaschetta 3D le cui pareti laterali toccano il substrato (spesso con drogaggio maggiorato *halo*), contribuendo per oltre il $50\%$ della capacità parassita totale. Nel SOI le pareti laterali toccano l'ossido STI spesso: **la capacità perimetrale è praticamente azzerata**.
+   * Di conseguenza, la capacità parassita complessiva vista dal nodo di Drain crolla del $70\% \div 80\%$, aumentando drasticamente la velocità di commutazione ($f_{\text{max}}$) e abbattendo la potenza dinamica di carica/scarica ($P_{\text{dyn}} = C V_{DD}^2 f$).
+
+> ❓ **"Se c'è una capacità parassita verso il fondo, se balla il substrato non balla anche il Drain?"**  
+> L'obiezione è ottima: ogni capacità trasferisce una corrente di spostamento $i = C \frac{dV}{dt}$. Tuttavia, il SOI garantisce un'immunità al rumore nettamente superiore al Bulk per 3 motivi:
+> 1. Essendo $C$ ridotta di $3-5$ volte, la corrente impulsiva accoppiata è proporzionalmente ridotta.
+> 2. Nel Bulk il substrato è un semiconduttore conduttivo resistivo ($\rho \approx 1 \div 10\,\Omega\cdot\text{cm}$): le commutazioni digitali iniettano portatori che scorrono nel silicio generando cadute ohmiche ($V = R_{\text{sub}} \cdot I$), facendo "ballare" direttamente il Bulk dei transistor analogici e **modulando la loro $V_{th}$ per effetto body**.
+> 3. Nel SOI l'ossido ha una resistività dielettrica infinita ($>10^{14}\,\Omega\cdot\text{cm}$): **nessuna corrente DC o portatore di carica può attraversare il BOX**, e il canale è schermato, azzerando l'effetto body dal substrato comune.
+> 👉 Approfondimento: [Confronto Tecnologie CMOS e BiCMOS](../Tecnologia%20e%20Fabbricazione/Confronto%20Tecnologie%20CMOS%20e%20BiCMOS.md).
+
 4. **Immunità Totale al [Latch-Up](../Famiglie%20Logiche/Latchup%20nei%20circuiti%20CMOS.md):**
    * Non esistendo un substrato continuo condiviso tra NMOS e PMOS, la catena di transistori parassiti a tiristore ($p^+-n-p-n^+$) è fisicamente interrotta. Il rischio di Latch-Up è **azzerato al $100\%$**.
 5. **Isolamento Dielettrico Completo tra Transistor Adiacenti:**
@@ -164,3 +174,4 @@ In sintesi, il Back-Gate offre una **manopola dinamica (DVFS - Dynamic Voltage a
 - [DIBL](../Effetti%20di%20Canale%20Corto/DIBL.md)
 - [Rapporto Ion/Ioff e Sottosoglia](../Effetti%20di%20Canale%20Corto/Rapporto%20Ion%20Ioff%20e%20sottosoglia.md)
 - [La soglia da cosa dipende](./La%20soglia%20da%20cosa%20dipende.md)
+- [Confronto Tecnologie CMOS e BiCMOS](../Tecnologia%20e%20Fabbricazione/Confronto%20Tecnologie%20CMOS%20e%20BiCMOS.md)
