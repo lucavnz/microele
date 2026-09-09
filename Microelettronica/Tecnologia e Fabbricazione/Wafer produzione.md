@@ -37,12 +37,13 @@ Per orientare univocamente un reticolo cristallino nello spazio servono due rife
 
 Conoscere l'orientamento nel piano serve per:
 * **Taglio dei singoli chip (Dicing / Cleavage):** il silicio si spezza preferenzialmente lungo certi piani reticolari (piani $\{111\}$ o $\{110\}$). Allineare i tagli lungo queste direzioni evita fratture diagonali e scheggiature dei die, massimizzando la resa produttiva ([Yield e Costo per bit](../Famiglie%20Logiche/Famiglia%20Logica%20e%20Costo%20per%20Bit.md)).
-* **Allineamento fotolitografico:** i macchinari usano il flat come riferimento meccanico e ottico per allineare le maschere rispetto al reticolo.
+* **Allineamento fotolitografico:** i macchinari usano il flat come riferimento meccanico e ottico per allineare le maschere rispetto al reticolo (vedi [Litografia Ottica e Immersione](./Litografia%20Ottica%20e%20Immersione.md)).
 * **Attacco chimico anisotropo (Etching):** sostanze come $\text{KOH}$ scavano il silicio a velocità diverse a seconda dei piani cristallini.
 
 ---
 
 *Pagine correlate:*
+- [Litografia Ottica e Immersione](./Litografia%20Ottica%20e%20Immersione.md)
 - [Famiglia Logica e Costo per Bit](../Famiglie%20Logiche/Famiglia%20Logica%20e%20Costo%20per%20Bit.md)
 - [MOS](../Dispositivi%20e%20Componenti/MOS.md)
 - [Resistore](../Dispositivi%20e%20Componenti/Resistore.md)

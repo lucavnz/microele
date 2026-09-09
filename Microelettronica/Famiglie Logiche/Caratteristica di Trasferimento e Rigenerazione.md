@@ -33,9 +33,14 @@ L'elevato guadagno $|A_v| \gg 1$ nella regione di transizione è il **"motore de
 * **Se il guadagno fosse ovunque $|A_v| \le 1$:** il circuito si comporterebbe come un sistema analogico lineare. Le transizioni temporali tra alto e basso sarebbero lentissime e un segnale che si trova a metà strada rimarrebbe intrappolato a metà strada, accumulando degrado e rumore ad ogni stadio.
 * **La natura bistabile del digitale:** l'alto guadagno al centro combinato con l'attenuazione ($|A_v| < 1$) agli estremi crea due stati di equilibrio stabili ($V_{OH}$ e $V_{OL}$) e forza il circuito a **prendere una decisione drastica**: o $0$ o $1$, senza vie di mezzo.
 
+👉 Approfondimento sulla retroazione bistabile (anelli pari) vs oscillatori ad anello (anelli dispari): [Retroazione nell'Inverter e Ring Oscillator](./Retroazione%20nell%27Inverter%20e%20Ring%20Oscillator.md).
+👉 Approfondimento sull'analisi analitica delle regioni dell'inverter complementare: [Inverter CMOS e Regioni di Funzionamento](./Inverter%20CMOS%20e%20Regioni%20di%20Funzionamento.md).
+
 ---
 
 *Pagine correlate:*
+- [Inverter CMOS e Regioni di Funzionamento](./Inverter%20CMOS%20e%20Regioni%20di%20Funzionamento.md)
+- [Retroazione nell'Inverter e Ring Oscillator](./Retroazione%20nell%27Inverter%20e%20Ring%20Oscillator.md)
 - [Famiglia Logica e Costo per Bit](./Famiglia%20Logica%20e%20Costo%20per%20Bit.md)
 - [Potenza Dinamica e Dissipazione di Carica](./Potenza%20Dinamica%20e%20Dissipazione%20di%20Carica.md)
 - [Soglia Logica e Margine di Rumore](./Soglia%20Logica%20e%20Margine%20di%20Rumore.md)

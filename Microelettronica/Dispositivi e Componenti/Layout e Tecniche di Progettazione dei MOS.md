@@ -137,7 +137,7 @@ A livello di tecnologia microscopica $C_{VT}$ è simile, ma **a parità di prest
 #### B) Orientazione Rigorosa anche per Polisilicio e Diffusioni
 Tutti i transistor e i resistori da accoppiare devono avere **identica orientazione geometrica**:
 1. **Stress Meccanico del Package:** La contrazione anisotropa della resina ($\sigma_x \neq \sigma_y$) si trasmette attraverso l'ossido alterando la mobilità e la piezoresistività ($\pi_l \neq \pi_t$).
-2. **Asimmetria di Incisione (Etching Bias):** La fotolitografia e l'attacco al plasma generano larghezze effettive diverse tra linee orizzontali e verticali ($W_X \neq W_Y$).
+2. **Asimmetria di Incisione (Etching Bias):** La fotolitografia (vedi [Litografia Ottica e Immersione](../Tecnologia%20e%20Fabbricazione/Litografia%20Ottica%20e%20Immersione.md)) e l'attacco al plasma generano larghezze effettive diverse tra linee orizzontali e verticali ($W_X \neq W_Y$).
 3. **Tilt Angle dell'Impiantazione ($7^\circ$):** Genera ombre asimmetriche nel drogaggio del canale e delle sacche.
 
 #### C) Bilanciamento delle Sacche di Drain nelle Coppie Differenziali (1D vs 2D)
@@ -158,7 +158,68 @@ Nelle coppie differenziali interdigitate, la simmetria capacitiva delle uscite $
 
 ---
 
+### 6. Regole di Layout Scalabili (SCMOS), Unità $\lambda$ e Regole DRC
+
+Nella progettazione fisica dei circuiti integrati (VLSI), disegnare geometrie specificando quote assolute in micron o nanometri renderebbe il layout obsoleto non appena la fonderia aggiorna il nodo tecnologico.  
+Per risolvere questo problema, il paradigma di Mead & Conway ha introdotto le **regole di layout scalabili (SCMOS)** basate sull'unità adimensionale **$\lambda$ (Lambda)**.
+
+#### A) Il Significato Fisico di $\lambda$
+* **Definizione:** $\lambda$ rappresenta la **risoluzione geometrica di base del processo**, tipicamente pari a **metà della lunghezza minima di canale** consentita dalla fonderia:
+  $$\lambda = \frac{L_{\min}}{2}$$
+  * Ad esempio, in un processo a $0.5\,\mu\text{m}$, $\lambda = 0.25\,\mu\text{m}$.
+  * In un processo a $0.18\,\mu\text{m}$, $\lambda = 0.09\,\mu\text{m} = 90\text{ nm}$.
+* **Fattore di scala:** Tutte le dimensioni del layout (larghezze piste, spaziature, aree di contatto) vengono espresse come **multipli interi di $\lambda$**. Quando si passa a una nuova tecnologia, la fonderia (*foundry*) applica un fattore di scala lineare su tutto il file di maschera (file GDSII), senza dover ridisegnare da capo il circuito.
+* **PDK (Process Design Kit):** In produzione industriale, le fonderie (es. TSMC) forniscono le regole DRC (*Design Rule Checking*) sia in formato scalabile $\lambda$ che in quote nanometriche assolute (*micron rules*).
+
+#### B) Le 4 Regole DRC Fondamentali e i Guasti Fisici Evitati
+Se le distanze minime imposte dalla fonderia vengono violate, le tolleranze di fabbricazione (imperfezioni litografiche, disallineamento maschere, sovrattacco chimico) causano il fallimento del chip:
+
+```
+                           LE 4 REGOLE DRC BASE IN λ
+                           
+    1. LARGHEZZA MINIMA (W >= 2λ)         2. SPAZIATURA MINIMA (S >= 3λ)
+         ┌───────────────┐                     ┌─────┐       ┌─────┐
+         │               │                     │     │◄─ S ─►│     │
+         └───┬───────┬───┘                     │     │       │     │
+             │ W>=2λ │                         └─────┘       └─────┘
+             └───────┘                      (Evita CORTI per ponti metallici)
+    (Evita CIRCUITI APERTI per over-etching)
+    
+    3. ESTENSIONE GATE (E >= 2λ)          4. ENCLOSURE CONTATTI (Enc >= 1λ)
+             Polisilicio                            Metallo / Diffusione
+         ┌───────────────┐                     ┌─────────────────┐
+         │       │       │                     │   ┌─────────┐   │
+    ─────┴───────┼───────┴─────                │   │ Contatto│   │
+      Diffusione │ Canale                      │   │  (Via)  │   │
+    ─────┬───────┼───────┬─────                │   └─────────┘   │
+         │       │◄─E>=2λ│                     └───┬─────────────┘
+         └───────────────┘                         │ Enc >= 1λ
+    (Evita CORTI Source-Drain parassiti)       (Evita corti nel substrato)
+```
+
+1. **Larghezza Minima (*Minimum Width*, $W \ge 2\lambda$):**
+   * Se una pista di metallo, diffusione o polisilicio viene disegnata troppo sottile ($< 2\lambda$), l'attacco chimico o al plasma durante l'incisione (*over-etching* o *undercutting*) può erodere interamente il materiale in un punto fragile.
+   * **Guasto evitato:** **Circuito aperto (interruzione della linea / open fault)**.
+2. **Spaziatura Minima (*Minimum Spacing*, $S \ge 3\lambda$):**
+   * Se due tracce conduttive adiacenti sono disegnate troppo vicine, le fluttuazioni litografiche dovute alla diffrazione ottica o residui metallici non incisi possono connetterle fisicamente.
+   * **Guasto evitato:** **Cortocircuito da ponte conduttivo (*bridging defect*)**.
+3. **Estensione del Gate oltre la Diffusione (*Gate Extension*, $\ge 2\lambda$):**
+   * La striscia di polisilicio che forma il Gate deve debordare oltre il perimetro dell'area attiva di diffusione per almeno $2\lambda$.
+   * **Motivazione fisica:** Le maschere litografiche del polisilicio e della diffusione non sono mai perfettamente allineate sull'asse ($x, y$), presentando un'incertezza statistica di allineamento (*misalignment* $\Delta x, \Delta y$). Se il gate terminasse a filo della diffusione, un disallineamento lascerebbe un corridoio di diffusione non coperto dal gate tra Source e Drain.
+   * **Guasto evitato:** **Cortocircuito parassita permanente tra Source e Drain (*punch-through* diretto non controllato dal gate)**.
+4. **Contorno del Contatto (*Contact Enclosure / Overlap*, $\ge 1\lambda$):**
+   * I fori di contatto (vias) devono essere circondati da un bordo di diffusione o metallo largo almeno $1\lambda$.
+   * **Motivazione fisica:** Un piccolo errore di posizionamento della maschera dei contatti farebbe cadere il foro metallico fuori dalla sacca drogata, iniettando metallo direttamente nel substrato o nel pozzetto.
+   * **Guasto evitato:** **Cortocircuito catastrofico tra il nodo circuitale e il potenziale di massa o substrato**.
+
+---
+
 *Pagine correlate:*
+- [Dimensionamento Transistor e Ritardo di Pattern (Sizing)](../Circuiti%20Combinatori%20CMOS/Dimensionamento%20Transistor%20e%20Ritardo%20di%20Pattern%20(Sizing).md)
+- [Effetto di Fan-In e Fan-Out sul Ritardo (Elmore)](../Circuiti%20Combinatori%20CMOS/Effetto%20di%20Fan-In%20e%20Fan-Out%20sul%20Ritardo%20(Elmore).md)
+- [Tecniche di Ottimizzazione per Porte Complesse Veloci](../Circuiti%20Combinatori%20CMOS/Tecniche%20di%20Ottimizzazione%20per%20Porte%20Complesse%20Veloci.md)
+- [Litografia Ottica e Immersione](../Tecnologia%20e%20Fabbricazione/Litografia%20Ottica%20e%20Immersione.md)
+- [Latchup nei circuiti CMOS](../Famiglie%20Logiche/Latchup%20nei%20circuiti%20CMOS.md)
 - [MOS](./MOS.md)
 - [Capacità parassite nel MOSFET](./Capacit%C3%A0%20parassite%20nel%20MOSFET.md)
 - [Matching e Variabilita nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)

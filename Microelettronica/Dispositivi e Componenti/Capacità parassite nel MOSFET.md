@@ -102,7 +102,7 @@ C_{GB} &= \underbrace{C_{gbo}}_{\text{Overlap perimetrale}} + \underbrace{C_{gbc
      $$\mathbf{C_{GD} = C_{gdo}}$$
 
 > [!NOTE]
-> In saturazione il crollo di $C_{GD}$ al solo overlap $C_{gdo}$ è di fondamentale importanza nei circuiti analogici: $C_{GD}$ costituisce la capacità di retroazione ingresso-uscita che viene amplificata dal guadagno dello stadio per **Effetto Miller** ($C_{in,Miller} \approx C_{GS} + (1 + |A_v|) C_{GD}$).
+> In saturazione il crollo di $C_{GD}$ al solo overlap $C_{gdo}$ è di fondamentale importanza nei circuiti analogici: $C_{GD}$ costituisce la capacità di retroazione ingresso-uscita che viene amplificata dal guadagno dello stadio per [Effetto Miller](./Effetto%20Miller.md) ($C_{in,Miller} \approx C_{GS} + (1 + |A_v|) C_{GD}$).
 
 ---
 
@@ -139,11 +139,11 @@ Nei MOS di larghezza $W$ elevata, dividendo il transistor in $N$ dita parallele 
 #### B) Comportamento in AC: Nodi a Massa vs Nodi Flottanti (Cascode e Differenziali)
 L'impatto circuitale di $C_{SB}$ e $C_{DB}$ dipende dal potenziale dinamico del nodo:
 * **Source collegato a massa/alimentazione ($v_s = 0$):** Il Source è una massa virtuale in AC. $C_{SB}$ è connessa tra massa e massa, quindi non passa corrente di segnale ed è ininfluente per la banda.
-* **Source su nodo flottante di segnale (es. Source del Cascode o nodo di coda differenziale):** Il potenziale $v_s(t)$ oscilla attivamente. La capacità $C_{SB}$ crea una perdita di corrente verso il substrato, determinando la posizione del **polo non dominante** dell'amplificatore:
+* **Source su nodo flottante di segnale (es. Source del Cascode o nodo di coda differenziale):** Il potenziale $v_s(t)$ oscilla attivamente (vedi [Coppia Differenziale e Cascode Telescopico](./Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)). La capacità $C_{SB}$ crea una perdita di corrente verso il substrato, determinando la posizione del **polo non dominante** dell'amplificatore:
   $$\omega_{p2} \approx \frac{g_{m,\text{cascode}}}{C_{D,\text{in}} + C_{S,\text{cascode}}}$$
   Dimezzare $C_D$ e $C_S$ tramite fingering sposta $\omega_{p2}$ a frequenze molto più elevate, preservando il **Margine di Fase** e la stabilità del circuito.
 
-👉 Per annullare completamente le giunzioni parassite verso il substrato si impiega la tecnologia [SOI (Silicon On Insulator)]SOI (Silicon On Insulator)](./SOI.md), dove l'ossido sepolto BOX isola interamente le sacche.
+👉 Per annullare completamente le giunzioni parassite verso il substrato si impiega la tecnologia [SOI (Silicon On Insulator)](./SOI.md), dove l'ossido sepolto BOX isola interamente le sacche.
 
 ---
 
@@ -168,6 +168,8 @@ Transistor ACCESO in Saturazione (Vgs > Vth, Vds >= Vov):
 ---
 
 *Pagine correlate:*
+- [Effetto Miller](./Effetto%20Miller.md)
+- [Coppia Differenziale e Cascode Telescopico](./Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)
 - [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
 - [MOS](./MOS.md)
 - [Matching e Variabilita nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)

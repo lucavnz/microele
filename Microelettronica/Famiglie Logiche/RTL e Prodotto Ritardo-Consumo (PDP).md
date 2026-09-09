@@ -36,6 +36,8 @@ $$t_p = \frac{t_{pHL} + t_{pLH}}{2}$$
 > Tuttavia, poiché in RTL $t_{pLH} \gg t_{pHL}$, il ritardo complessivo è **dominato quasi per intero dal fronte lento di salita**:
 > $$t_p \approx \frac{t_{pLH}}{2} \approx 434\text{ ps}$$
 
+👉 Approfondimento sulla misura sperimentale di $t_p$ tramite oscillatori ad anello: [Retroazione nell'Inverter e Ring Oscillator](./Retroazione%20nell%27Inverter%20e%20Ring%20Oscillator.md).
+
 ---
 
 ### 3. Il Trade-off di $R_C$ e il Prodotto Ritardo-Consumo ($PDP \approx \text{costante}$)
@@ -59,6 +61,7 @@ $$PDP \approx P_s \cdot t_p \approx \left( 1 + \frac{R_C}{R_B} \right) \frac{V_{
 ---
 
 *Pagine correlate:*
+- [Retroazione nell'Inverter e Ring Oscillator](./Retroazione%20nell%27Inverter%20e%20Ring%20Oscillator.md)
 - [DCTL e Current Hogging](./DCTL%20e%20Current%20Hogging.md)
 - [I2L (Integrated Injection Logic)](./I2L%20%28Integrated%20Injection%20Logic%29.md)
 - [DTL (Diode-Transistor Logic)](./DTL%20%28Diode-Transistor%20Logic%29.md)

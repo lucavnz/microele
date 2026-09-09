@@ -75,6 +75,11 @@ Ovvero, espressa rispetto alla soglia naturale $V_{th0}$:
 $$V_{th}(V_{SB}) = V_{th0} + \gamma \left( \sqrt{2\Phi_F + V_{SB}} - \sqrt{2\Phi_F} \right)$$
 All'aumentare di $V_{SB}$, la tensione di soglia $V_{th}$ **aumenta**.
 
+> [!WARNING]
+> **Il vincolo fisico della giunzione nel Bulk vs [SOI](./SOI.md):**
+> Nel Bulk convenzionale, tra Source ($n^+$) e Substrato ($p$) esiste una vera giunzione $p\text{-}n$. Possiamo applicare solo $V_{SB} > 0$ (*Reverse Body Bias* per alzare la soglia). Se tentassimo un *Forward Body Bias* ($V_{BS} > 0$, cioè $V_{SB} < 0$) per abbassare la soglia e accelerare il dispositivo, appena superati $0.3 - 0.4\,\text{V}$ la giunzione Source-Substrato si accenderebbe in diretta conducendo correnti parassite enormi e innescando il **latch-up**.
+> Per superare questo limite e consentire una sintonizzazione dinamica bidirezionale della soglia (sia Turbo FBB che Sleep RBB) senza rischi di conduzione di giunzione, si adotta la tecnologia [UTBB FD-SOI](./SOI.md), dove l'ossido sepolto (BOX) isola completamente il canale dal Back-Gate.
+
 ---
 
 ### 5. La Deriva Termica della Soglia $V_{th}(T)$

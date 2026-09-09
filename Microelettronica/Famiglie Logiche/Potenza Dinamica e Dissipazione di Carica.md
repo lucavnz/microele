@@ -55,6 +55,9 @@ $$P_d = C \cdot V_{DD}^2 \cdot f$$
 ---
 
 *Pagine correlate:*
+- [Dimensionamento Progressivo e Tapered Buffer](./Dimensionamento%20Progressivo%20e%20Tapered%20Buffer.md)
+- [Ritardo di Propagazione e Dimensionamento dell'Inverter CMOS](./Ritardo%20di%20Propagazione%20e%20Dimensionamento%20dell%27Inverter%20CMOS.md)
+- [Effetto Miller](../Dispositivi%20e%20Componenti/Effetto%20Miller.md)
 - [Famiglia Logica e Costo per Bit](./Famiglia%20Logica%20e%20Costo%20per%20Bit.md)
 - [Caratteristica di Trasferimento e Rigenerazione](./Caratteristica%20di%20Trasferimento%20e%20Rigenerazione.md)
 - [Soglia Logica e Margine di Rumore](./Soglia%20Logica%20e%20Margine%20di%20Rumore.md)

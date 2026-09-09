@@ -88,7 +88,7 @@ A causa delle commutazioni simultanee e dell'induttanza parassita dei package ($
 
 ### 4. Il Rischio Fatale: Il Meccanismo del Latch-Up
 
-L'effetto più distruttivo dell'interazione tra sacche, substrato e cadute di potenziale resistivo è il **Latch-Up**.
+L'effetto più distruttivo dell'interazione tra sacche, substrato e cadute di potenziale resistivo è il [Latchup nei circuiti CMOS](../Famiglie%20Logiche/Latchup%20nei%20circuiti%20CMOS.md).
 
 #### A. La Struttura Parassita a Tiristore (SCR)
 In qualsiasi processo CMOS su bulk, le diffusioni $p^+$ del PMOS, la $n\text{-well}$, il substrato $p$ e le diffusioni $n^+$ dell'NMOS creano una sequenza a 4 strati **$p^+ - n - p - n^+$**:
@@ -139,6 +139,7 @@ Per garantire che $\beta_{NPN} \cdot \beta_{PNP} < 1$ e che le cadute ohmiche no
 ---
 
 *Pagine correlate:*
+- [Latchup nei circuiti CMOS](../Famiglie%20Logiche/Latchup%20nei%20circuiti%20CMOS.md)
 - [SOI](../Dispositivi%20e%20Componenti/SOI.md)
 - [MOS](../Dispositivi%20e%20Componenti/MOS.md)
 - [CVD](./CVD.md)

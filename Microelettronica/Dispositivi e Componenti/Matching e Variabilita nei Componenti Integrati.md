@@ -161,11 +161,11 @@ $$\sigma(\Delta V_T) = \frac{C_{VT}}{\sqrt{W_{\text{eff}} \cdot L_{\text{eff}}}}
 #### B) Perché la Stessa Orientazione vale anche per il Polisilicio fuori dal Substrato?
 Anche se il polisilicio è depositato sopra l'ossido e non nel silicio monocristallino del wafer:
 1. **Piezoresistività del Poly:** La resina e il frame metallico del package si contraggono a freddo molto più del silicio, **incurvando l'intero chip**. Questo stress meccanico si trasmette attraverso l'ossido al polisilicio: poiché $\pi_l \neq \pi_t$ e lo stress $\sigma_x \neq \sigma_y$, due strisce ortogonali deviano in direzioni opposte ($R_X \uparrow, R_Y \downarrow$).
-2. **Asimmetria di Incisione (Etching Bias):** L'incisione plasma RIE e la fotolitografia incidono larghezze diverse lungo $X$ e $Y$ ($W_X \neq W_Y$).
+2. **Asimmetria di Incisione (Etching Bias):** L'incisione plasma RIE e la fotolitografia (vedi [Litografia Ottica e Immersione](../Tecnologia%20e%20Fabbricazione/Litografia%20Ottica%20e%20Immersione.md)) incidono larghezze diverse lungo $X$ e $Y$ ($W_X \neq W_Y$).
 3. **Tilt Angle dell'Impiantazione ($7^\circ$):** Genera ombreggiature asimmetriche nel drogaggio.
 
 #### C) Bilanciamento delle Sacche di Drain nelle Coppie Differenziali (1D vs 2D)
-* **Nel layout 1D asimmetrico ($A-A-B-B$):** Il ramo differenziale $A$ ha 1 sacca di Drain condivisa ($C_C \approx 1 \cdot C_{\text{drain}}$), mentre il ramo $B$ ha 2 sacche ($C_D \approx 2 \cdot C_{\text{drain}}$). Questo raddoppio di capacità parassita distrugge la simmetria dinamica e il **CMRR ad alta frequenza**.
+* **Nel layout 1D asimmetrico ($A-A-B-B$):** Il ramo differenziale $A$ ha 1 sacca di Drain condivisa ($C_C \approx 1 \cdot C_{\text{drain}}$), mentre il ramo $B$ ha 2 sacche ($C_D \approx 2 \cdot C_{\text{drain}}$). Questo raddoppio di capacità parassita distrugge la simmetria dinamica e il **CMRR ad alta frequenza** (vedi [Coppia Differenziale e Cascode Telescopico](./Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)).
 * **Nel layout 2D Common Centroid:** La seconda riga inverte l'ordine dei finger, garantendo **$5 + 5$ sacche di Drain perfettamente pareggiate** su entrambi i rami.
 
 👉 Approfondimento completo con schemi e calcoli: [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
@@ -173,6 +173,8 @@ Anche se il polisilicio è depositato sopra l'ossido e non nel silicio monocrist
 ---
 
 *Pagine correlate:*
+- [Litografia Ottica e Immersione](../Tecnologia%20e%20Fabbricazione/Litografia%20Ottica%20e%20Immersione.md)
+- [Coppia Differenziale e Cascode Telescopico](./Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)
 - [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
 - [MOS](./MOS.md)
 - [Capacità parassite nel MOSFET](./Capacit%C3%A0%20parassite%20nel%20MOSFET.md)

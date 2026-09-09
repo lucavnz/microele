@@ -94,7 +94,32 @@ In tecnologia SOI il silicio attivo massivo è sostituito da un sottile film app
 
 ---
 
+### 9. L'Evoluzione Tridimensionale: Transistori FinFET (Tri-Gate)
+
+Sotto i $22\,\text{nm}$, il MOSFET planare è stato sostituito dalla struttura **FinFET (Tri-Gate)**:
+* Il canale non è più una piastra bidimensionale, ma una **pinna verticale 3D** avvolta dal Gate su tre lati.
+* **Vantaggi principali:**
+  1. A parità di impronta a terra (*footprint*), la larghezza efficace triplica ($W_{\text{eff}} = 2 H_{\text{fin}} + W_{\text{fin}}$), moltiplicando la corrente utile per unità di area.
+  2. Il controllo elettrostatico perfetto sopprime il [DIBL](../Effetti%20di%20Canale%20Corto/DIBL.md) e consente l'uso di silicio **non drogato (intrinseco)**, azzerando le fluttuazioni casuali di soglia (RDF) e massimizzando la mobilità $\mu$.
+* 👉 Approfondimento completo su fisica, quantizzazione di $W$ e fabbricazione: [FinFET](./FinFET.md)
+
+---
+
+### 10. Lo Scaling dei Materiali: High-$\kappa$ Metal Gate e Silicio Deformato
+
+Quando lo spessore dell'ossido ha raggiunto il limite atomico di $1.5 - 2\,\text{nm}$ (5 strati atomici) innescando correnti di perdita mostruose per effetto tunnel quantistico, lo sviluppo ha introdotto nuovi materiali:
+* **High-$\kappa$ Metal Gate (HKMG):** Sostituzione di $\text{SiO}_2$ con biossido di afnio ($\text{HfO}_2$, $\epsilon_r \approx 25$) e del polisilicio con elettrodi metallici, azzerando il tunneling e il *poly-depletion*. Realizzato prevalentemente con processo **Gate-Last / RMG**.
+  👉 Approfondimento: [High-k e Metal Gate (HKMG)](./High-k%20e%20Metal%20Gate%20(HKMG).md)
+* **Strained Silicon (Silicio Deformato):** Ingegnerizzazione meccanica del reticolo tramite tasche epitassiali di $\text{SiGe}$ per PMOS (compressione) e cappucci in $\text{Si}_3\text{N}_4$ per NMOS (trazione). Aumenta la mobilità delle lacune fino al $+500\%$, consentendo la fondamentale **equalizzazione P-N** nei circuiti CMOS.
+  👉 Approfondimento: [Strained Silicon (Silicio Deformato)](./Strained%20Silicon%20(Silicio%20Deformato).md)
+
+---
+
 *Pagine correlate:*
+- [FinFET](./FinFET.md)
+- [High-k e Metal Gate (HKMG)](./High-k%20e%20Metal%20Gate%20(HKMG).md)
+- [Strained Silicon (Silicio Deformato)](./Strained%20Silicon%20(Silicio%20Deformato).md)
+- [Rapporto Ion/Ioff e Sottosoglia](../Effetti%20di%20Canale%20Corto/Rapporto%20Ion%20Ioff%20e%20sottosoglia.md)
 - [Overdrive e Regioni di Inversione](./Overdrive%20e%20Regioni%20di%20Inversione.md)
 - [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
 - [Capacità parassite nel MOSFET](./Capacit%C3%A0%20parassite%20nel%20MOSFET.md)
