@@ -48,8 +48,8 @@ $$A_0 = g_m \cdot r_o \propto L$$
 
 ### Impatto sulla progettazione analogica:
 Per ottenere amplificatori ad alto guadagno (es. operazionali con $A_{v0} \ge 80\,\text{dB}$):
-* Nelle vecchie tecnologie bastavano uno o due stadi semplici o una struttura cascode: [Coppia Differenziale e Cascode Telescopico](../Dispositivi%20e%20Componenti/Coppia%20Differenziale%20e%20Cascode%20Telescopico.md).
-* Nelle tecnologie nanometriche avanzate siamo costretti a progettare **amplificatori complessi multistadio** (3 o più stadi), che introducono poli multipli, rendendo molto difficile la stabilizzazione ad anello chiuso e la compensazione in frequenza.
+* Nelle vecchie tecnologie bastavano uno o due stadi semplici o una struttura cascode: [Coppia Differenziale e Cascode Telescopico](../Dispositivi%20e%20Componenti/Coppia%20Differenziale%20e%20Cascode%20Telescopico.md), eventualmente evoluta in [Folded Cascode e Recycling](../Dispositivi%20e%20Componenti/Folded%20Cascode%20e%20Recycling.md) o potenziata tramite [Gain Boosting (Regulated Cascode)](../Dispositivi%20e%20Componenti/Gain%20Boosting.md) per ripristinare $R_{out}$ elevatissime senza perdere swing.
+* Nelle tecnologie nanometriche avanzate siamo altrimenti costretti a progettare **amplificatori complessi multistadio** (3 o più stadi), che introducono poli multipli, rendendo molto difficile la stabilizzazione ad anello chiuso e la compensazione in frequenza.
 
 ---
 
@@ -89,11 +89,13 @@ $$\frac{1}{\Delta L} \cong \frac{1}{\Delta L_{\text{(1st order)}}} + \frac{C_{ox
 ---
 
 *Pagine correlate:*
+- [Gain Boosting (Regulated Cascode)](../Dispositivi%20e%20Componenti/Gain%20Boosting.md)
+- [Folded Cascode e Recycling](../Dispositivi%20e%20Componenti/Folded%20Cascode%20e%20Recycling.md)
+- [Coppia Differenziale e Cascode Telescopico](../Dispositivi%20e%20Componenti/Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)
 - [DIBL](./DIBL.md)
 - [Saturazione di velocita](./Saturazione%20di%20velocita.md)
 - [Portatori Caldi (Hot Carriers)](./Hot%20carriers.md)
 - [Rumore nel MOSFET](../Dispositivi%20e%20Componenti/Rumore%20nel%20MOSFET.md)
 - [Overdrive e Regioni di Inversione](../Dispositivi%20e%20Componenti/Overdrive%20e%20Regioni%20di%20Inversione.md)
-- [Coppia Differenziale e Cascode Telescopico](../Dispositivi%20e%20Componenti/Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)
 - [Analogico non si scende di dimensioni](../Scaling%20e%20Limiti%20Fisici/Analogico%20non%20si%20scende%20di%20dimensioni.md)
 - [Inverter CMOS e Regioni di Funzionamento](../Famiglie%20Logiche/Inverter%20CMOS%20e%20Regioni%20di%20Funzionamento.md)

@@ -110,7 +110,7 @@ Il cascode telescopico fornisce il guadagno tipico di una cascata a due stadi ($
   Ciascun transistor per rimanere in saturazione richiede una caduta minima pari alla propria [tensione di overdrive](./Overdrive%20e%20Regioni%20di%20Inversione.md) $V_{ov} = V_{GS} - V_{TH}$.  
   Lo swing utile della tensione d'uscita è quindi compresso:
   $$V_{out,\text{max}} - V_{out,\text{min}} \approx V_{DD} - 5 V_{ov}$$
-  Con alimentazioni moderne basse ($V_{DD} \le 1.2\text{ V}$), se ogni transistor ha $V_{ov} \approx 150 \div 200\text{ mV}$, lo swing residuo diventa quasi nullo ($< 200\text{ mV}$). In tali contesti si preferisce il *Folded Cascode* (che disaccoppia l'alimentazione consumando più corrente) o amplificatori a 2 stadi.
+  Con alimentazioni moderne basse ($V_{DD} \le 1.2\text{ V}$), se ogni transistor ha $V_{ov} \approx 150 \div 200\text{ mV}$, lo swing residuo diventa quasi nullo ($< 200\text{ mV}$). In tali contesti si preferisce il [Folded Cascode e Recycling](./Folded%20Cascode%20e%20Recycling.md) (che disaccoppia l'alimentazione recuperando swing, o raddoppia il guadagno a pari consumo col recycling) oppure si potenzia la resistenza di uscita tramite [Gain Boosting](./Gain%20Boosting.md).
 
 #### Dipendenza termica nel Cascode Telescopico:
 Poiché $A_{v0} \approx \frac{1}{2}(g_m r_o)^2$, e ciascun fattore intrinseco $g_m r_o$ si riduce con la temperatura a causa del calo di mobilità $\mu(T)$, anche nel cascode telescopico **il guadagno in continua scende sensibilmente con l'aumento della temperatura**.
@@ -118,6 +118,8 @@ Poiché $A_{v0} \approx \frac{1}{2}(g_m r_o)^2$, e ciascun fattore intrinseco $g
 ---
 
 *Pagine correlate:*
+- [Folded Cascode e Recycling](./Folded%20Cascode%20e%20Recycling.md)
+- [Gain Boosting (Regulated Cascode)](./Gain%20Boosting.md)
 - [Effetto Miller](./Effetto%20Miller.md)
 - [MOS](./MOS.md)
 - [Crollo della Resistenza di Uscita (ro) e Guadagno Intrinseco](../Effetti%20di%20Canale%20Corto/Crollo%20di%20ro.md)
