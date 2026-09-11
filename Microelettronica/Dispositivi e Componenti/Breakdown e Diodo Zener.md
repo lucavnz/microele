@@ -90,10 +90,53 @@ Nelle famiglie logiche industriali come l'[HTL (High-Threshold Logic)](../Famigl
 
 ---
 
+### 5. Perché quegli strani valori ($< 4\,\text{V}$, $\approx 5\,\text{V}$, $> 6\,\text{V}$)? Sono fissi per tutti i componenti?
+
+**No, non sono valori fissi di breakdown per tutti i dispositivi al mondo!**  
+Esistono diodi e transistor ad alta tensione che vanno in breakdown a $20\,\text{V}$, $100\,\text{V}$, $600\,\text{V}$ o $1200\,\text{V}$.
+
+I numeri $4\,\text{V}$, $5\,\text{V}$, $6\,\text{V}$ rappresentano i **confini fisici intrinseci del SILICIO** che determinano **quale meccanismo microscopico è fisicamente in grado di innescarsi**:
+
+```text
+    TENSIONE DI BREAKDOWN DEL COMPONENTE (V_BR):
+    
+    0 V          4 V           5.5 V         6 V                           100 V ... 1000 V
+    ├─────────────┼──────────────┼────────────┼───────────────────────────────┤
+    │  Solo       │  Misto       │  Entrambi  │         Solo                  │
+    │  EFFETTO    │  Tunnel +    │  Bilanciati│        MOLTIPLICAZIONE        │
+    │  TUNNEL     │  Valanga     │  (TC = 0)  │          A VALANGA            │
+    │  (Zener)    │              │            │     (Impact Ionization)       │
+```
+
+1. **Sotto i $4\,\text{V}$ (Solo Effetto Tunnel):**  
+   Perché avvenga il tunneling quantistico, la barriera di svuotamento deve essere nanometrica ($W < 10\,\text{nm}$). Questo richiede drogaggi altissimi ($p^+/n^+$). Con una barriera così stretta bastano $2.5 \div 4\,\text{V}$ per allineare le bande ed elettroni che passano dall'altra parte.  
+   *La valanga è fisicamente impossibile:* l'elettrone non ha la distanza fisica (il cammino libero medio) per accelerare e urtare un atomo; attraversa prima la giunzione per tunnel!
+2. **Sopra i $6\,\text{V}$ (Solo Valanga):**  
+   Per reggere tensioni più alte, la zona di svuotamento $W$ deve essere larga (drogaggio più basso). Ma con $W$ larga micron, la probabilità di tunneling quantistico è **rigorosamente zero** ($e^{-W} \to 0$). In compenso, l'elettrone ha tutto lo spazio per accelerare, raggiungere $E_{cin} \ge 1.5 E_g$ e innescare la ionizzazione per impatto.
+3. **Chi decide quale breakdown avviene?**  
+   **Il drogaggio impostato in fabbrica dal costruttore.** Non è l'utente dall'esterno a decidere: se compri uno Zener da $3.3\,\text{V}$ andrà solo a tunnel, se compri uno Zener da $12\,\text{V}$ andrà solo a valanga. A $5.1 \div 5.6\,\text{V}$ i due effetti coesistono e compensano reciprocamente i coefficienti termici.
+
+---
+
+### 6. La Valanga "Controllata" prima del Breakdown (Fattore M e Rumore Shot)
+
+La ionizzazione per impatto non scatta all'improvviso come un'esplosione, ma parte in modo **graduale**:
+
+1. **Valanga controllata ($M > 1$, es. $M = 1.01 \div 1.05$):**  
+   A campi elettrici elevati ma ancora inferiori a $V_{BR}$ (es. al pinch-off del Drain di un MOSFET a canale corto), solo una piccolissima frazione di portatori acquista energia sufficiente per spaccare i legami.  
+   Si genera una corrente secondaria $I_{av} = (M - 1) I_D$ modesta (frazioni di $\mu\text{A}$). Il componente non esplode né va in corto circuito, ma trattandosi di eventi quantistici discreti e casuali, genera un fortissimo **Shot Noise** ($2 q I_{av}$, vedi [Rumore nel MOSFET](./Rumore%20nel%20MOSFET.md)).
+2. **Breakdown catastrofico ($M \to \infty$):**  
+   Quando la tensione inversa raggiunge $V_{BR}$, il fattore di moltiplicazione di Miller $M = \frac{1}{1 - (V/V_{BR})^m}$ diverge matematicamente all'infinito. La reazione a catena diventa autosostenuta, la caratteristica diventa verticale e la corrente esplode.
+
+---
+
 *Pagine correlate:*
 - [Diodo PIN e Modulazione di Conducibilita](./Diodo%20PIN%20e%20Modulazione%20di%20Conducibilita.md)
 - [Contatti Ohmici e Giunzioni High-Low](./Contatti%20Ohmici%20e%20Giunzioni%20High-Low.md)
 - [HTL (High-Threshold Logic)](../Famiglie%20Logiche/HTL%20%28High-Threshold%20Logic%29.md)
+- [Rumore nel MOSFET](./Rumore%20nel%20MOSFET.md)
+- [Portatori Caldi (Hot Carriers)](../Effetti%20di%20Canale%20Corto/Hot%20carriers.md)
+- [Crollo della Resistenza di Uscita (ro)](../Effetti%20di%20Canale%20Corto/Crollo%20di%20ro.md)
 - [Diodo](./Diodo.md)
 - [BJT](./BJT.md)
 - [Difficoltà nel fare un componente ideale](../Scaling%20e%20Limiti%20Fisici/Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)

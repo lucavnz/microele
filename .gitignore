@@ -11,3 +11,14 @@ desktop.ini
 # Obsidian workspace layout
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bcf
+*.run.xml
+*.toc
+*.out

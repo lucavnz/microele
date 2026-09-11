@@ -1,0 +1,1704 @@
+\documentclass[12pt,a4paper,twoside]{report}
+
+% Pacchetti essenziali
+\usepackage{bm}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage[american]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc, fit}
+\usepackage[style=numeric,backend=biber]{biblatex} % Carica il pacchetto bibliografia
+\addbibresource{riferimenti.bib} % Carica il file creato prima
+% Configurazione geometria pagina
+\geometry{
+    top=3cm,
+    bottom=3cm,
+    left=3cm,
+    right=3cm
+}
+
+% Configurazione hyperref
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Progetto di PSEA},
+    pdfauthor={Nome Studenti},
+}
+
+% Configurazione header e footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Configurazione listings per codice
+\lstset{
+    backgroundcolor=\color{gray!10},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{green!60!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{orange},
+    numbers=left,
+    numbersep=5pt,
+    numberstyle=\tiny\color{gray},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+% Configurazione siunitx
+\sisetup{
+    output-decimal-marker = {.},
+    group-minimum-digits = 4,
+    group-separator = {\,}
+}
+
+\onehalfspacing
+
+\begin{document}
+
+% --- PAGINA INIZIALE (FRONTESPIZIO) ---
+\begin{titlepage}
+    \centering
+    \null
+    \vfill
+    
+    {\huge \bfseries Progettazione e Caratterizzazione di un Amplificatore a Transconduttanza Telescopico Single-Ended \par}
+    
+    \vspace{2.5cm}
+    
+    {\large Avanzi Luca \par}
+    \vspace{0.2cm}
+    {\large Matricola: 737186 \par}
+
+    \vfill
+    \null
+\end{titlepage}
+
+
+% --- INDICI ---
+\tableofcontents
+\clearpage
+\chapter{Introduzione}
+\label{chap:introduzione}
+Il progetto consiste nella realizzazione e caratterizzazione di un amplificatore OTA a singolo stadio di tipo cascode telescopico single-ended, con coppia d'ingresso PMOS. Questa specifica architettura prende il nome di ``telescopica'' per via dello stack verticale di transistor, tra l'alimentazione e la massa, proprio come i segmenti di un telescopio.
+
+La topologia permette di avere un guadagno elevato con un singolo stadio, paragonabile a quello di un amplificatore Miller a due stadi. Di conseguenza, il circuito ha un unico nodo ad alta impedenza: l'uscita. I restanti poli si trovano a frequenze più alte, poiché vedono una resistenza equivalente molto più bassa. Di conseguenza, non è richiesta una capacità di compensazione di Miller per garantire la stabilità in retroazione, e la larghezza di banda risulta più ampia.
+
+Il compromesso principale di questa rete è la riduzione dell'Output Voltage Swing e dell'ICMR (Input Common-Mode Range); infatti, lo stack di transistor richiede che una buona parte dell'alimentazione venga spesa per mantenere tutti i dispositivi in regione di saturazione.
+
+La tecnologia utilizzata è una CMOS a $0.18\,\mathrm{\mu m}$, con tensione di alimentazione di $1.8\,\mathrm{V}$. Il dimensionamento dei rapporti $W/L$ dei dispositivi è stato condotto tramite apposite simulazioni su Cadence e per via analitica, sfruttando le equazioni di un modello semplificato del primo ordine. I parametri fondamentali del processo, come la mobilità dei portatori, le tensioni di soglia e le costanti tecnologiche, sono stati estratti dai modelli forniti da Cadence. L'obiettivo del dimensionamento è stato quello di massimizzare il guadagno di tensione e il CMRR, minimizzare la tensione di offset riportata all'ingresso (sia sistematica che dovuta al mismatch) e garantire dinamiche sufficienti per ingresso e uscita.
+
+La figura~\ref{fig:schema_telescopico} mostra lo schematico circuitale dell'amplificatore. Per chiarezza visiva, i transistor sono stati rappresentati utilizzando la simbologia semplificata a tre terminali (la connessione del terminale di bulk è stata omessa); la corretta polarizzazione del substrato verrà trattata in seguito, durante la fase di implementazione dello schematico su Cadence.
+
+\begin{figure}[htbp]
+    \centering
+    
+    \ctikzset{tripoles/mos style/arrows}
+    \ctikzset{tripoles/pmos style/nocircle}
+    
+    \begin{circuitikz}[american, thick]
+    
+    % ---------------------------------------------------
+    % VDD Nodes
+    % ---------------------------------------------------
+    \draw (0, 4.5) node[vcc] {$V_{DD}$};
+    \draw (-6.5, 4.5) node[vcc] {$V_{DD}$};
+    
+    % ---------------------------------------------------
+    % Ramo di riferimento (M10)
+    % ---------------------------------------------------
+    % M10 spostato a x=-6.5 per distanziarlo bene dalla coppia
+    \draw (-6.5, 3.5) node[pmos, xscale=-1] (M10) {};
+    \node[align=center, left] at (-6.8, 3.5) {\scriptsize \textbf{M10}\\[-0.5ex]};
+    \draw (M10.S) -- (-6.5, 4.5);
+    
+    % Generatore di corrente I_REF verso GND
+    \draw (M10.D) to[I, l={$I_{ref} = 50\,\mathrm{\mu A}$}] (-6.5, 0.5) node[ground]{};
+    
+    % ---------------------------------------------------
+    % Tail current source (M9)
+    % ---------------------------------------------------
+    \draw (0, 3.5) node[pmos] (M9) {};
+    \node[align=center, right] at (0.3, 3.5) {\scriptsize \textbf{M9}\\[-0.5ex]};
+    \draw (M9.S) -- (0, 4.5);
+    
+    % Connessione gate M10 -> M9 e diodo a 90 GRADI su M10
+    \draw (M10.G) -- (M9.G);
+    \draw (M10.D) node[circ]{} -| (M10.G) node[circ]{};
+    
+    % Nodo di Tail (Source accoppiati M1/M2)
+    \draw (M9.D) -- (0, 2);
+    \node[circ] at (0, 2) {};
+    \draw (-2.5, 2) -- (2.5, 2);
+    
+    % ---------------------------------------------------
+    % Coppia Differenziale (M1, M2)
+    % ---------------------------------------------------
+    \draw (-2.5, 1) node[pmos] (M1) {};
+    \node[align=center, right] at (-2.0, 1) {\scriptsize \textbf{M1}\\[-0.5ex]};
+    \draw (M1.S) -- (-2.5, 2);
+    \draw (M1.G) -- ++(-0.5,0) node[ocirc]{} node[left] {$V^+$};
+    
+    \draw (2.5, 1) node[pmos, xscale=-1] (M2) {};
+    \node[align=center, left] at (2.0, 1) {\scriptsize \textbf{M2}\\[-0.5ex]};
+    \draw (M2.S) -- (2.5, 2);
+    \draw (M2.G) -- ++(0.5,0) node[ocirc]{} node[right] {$V^-$};
+    
+    % ---------------------------------------------------
+    % Cascode PMOS (M3, M4)
+    % ---------------------------------------------------
+    \draw (-2.5, -1) node[pmos, xscale=-1] (M3) {};
+    \node[align=center, left] at (-2.8, -1) {\scriptsize \textbf{M3}\\[-0.5ex]};
+    \draw (M1.D) -- (M3.S);
+    
+    \draw (2.5, -1) node[pmos] (M4) {};
+    \node[align=center, right] at (2.8, -1) {\scriptsize \textbf{M4}\\[-0.5ex]};
+    \draw (M2.D) -- (M4.S);
+    
+    % Connessione V_B tra M3 e M4
+    \draw (M3.G) -- (M4.G);
+    \node[circ] at (0, -1) {};
+    \draw (0, -1) -- (0, -0.5) node[ocirc]{} node[above] {$V_B$};
+    
+    % ---------------------------------------------------
+    % Carico Attivo Cascode (M5, M6)
+    % ---------------------------------------------------
+    \draw (-2.5, -3.5) node[nmos, xscale=-1] (M5) {};
+    \node[align=center, left] at (-2.8, -3.5) {\scriptsize \textbf{M5}\\[-0.5ex]};
+    \draw (M3.D) -- (M5.D);
+    
+    \draw (2.5, -3.5) node[nmos] (M6) {};
+    \node[align=center, right] at (2.8, -3.5) {\scriptsize \textbf{M6}\\[-0.5ex]};
+    
+    % Gate in comune e connessione a diodo a 90 GRADI per M5
+    \draw (M5.G) -- (M6.G);
+    \draw (M5.D) node[circ]{} -| (M5.G) node[circ]{};
+    
+    % ---------------------------------------------------
+    % Specchio di Base Carico Attivo (M7, M8)
+    % ---------------------------------------------------
+    \draw (-2.5, -6) node[nmos, xscale=-1] (M7) {};
+    \node[align=center, left] at (-2.8, -6) {\scriptsize \textbf{M7}\\[-0.5ex]};
+    \draw (M5.S) -- (M7.D);
+    
+    \draw (2.5, -6) node[nmos] (M8) {};
+    \node[align=center, right] at (2.8, -6) {\scriptsize \textbf{M8}\\[-0.5ex]};
+    \draw (M6.S) -- (M8.D);
+    
+    % Gate in comune e connessione a diodo a 90 GRADI per M7
+    \draw (M7.G) -- (M8.G);
+    \draw (M7.D) node[circ]{} -| (M7.G) node[circ]{};
+    
+    % Connessioni a GND
+    \draw (M7.S) node[ground]{};
+    \draw (M8.S) node[ground]{};
+    
+    % ---------------------------------------------------
+    % Uscita Single-Ended (V_out)
+    % ---------------------------------------------------
+    \draw (M4.D) -- (M6.D) coordinate[midway] (VoutNode);
+    \draw (VoutNode) node[circ]{} -- ++(1.5,0) node[ocirc]{} node[right] {$V_{out}$};
+    
+    \end{circuitikz}
+    
+    \caption{Schematico circuitale dell'amplificatore OTA con architettura cascode telescopica single-ended. I terminali di body sono stati omessi per chiarezza espositiva.}
+    \label{fig:schema_telescopico}
+\end{figure}
+\noindent L'ingresso è applicato sui gate di M1 e M2. L'uscita è single-ended, prelevata sul nodo comune ai drain di M4 e M6. Il generatore della corrente di coda è stato implementato come uno specchio di corrente PMOS, costituito dai transistor M9 e M10; sul drain di M10 è stato inserito un generatore di corrente ideale verso massa, che fissa la corrente di riferimento $I_{ref}=50\,\mathrm{\mu A}$. La tensione $V_B$ polarizza i gate di M3 e M4.
+
+\newpage
+\chapter{Analisi del Guadagno}
+\section{Transconduttanza $G_m$}
+La funzione primaria dell'OTA è convertire una tensione differenziale applicata all'ingresso in una corrente in uscita. Il "motore" del circuito è la transconduttanza equivalente $G_m$. Si calcola, in regime di piccoli segnali, ponendo il nodo di uscita a massa e applicando un segnale differenziale in ingresso:  $+v_{in}/2$ sul gate di M1 e $-v_{in}/2$ sul gate di M2. Per quest'analisi si è trascurato l'effetto body. Il circuito  di riferimento è quello di figura \ref{fig:schema_telescopico}. 
+
+ \vspace{0.3cm}
+ 
+ \noindent Consideriamo il ramo di sinistra. M1 genera una corrente pari a:
+$$i_{d1} = g_{m1} \frac{v_{in}}{2}$$
+
+\vspace{0.1cm}
+\noindent Questa corrente arriva al nodo tra il drain di M1 e il source di M3:
+\begin{itemize}
+    \item Verso M1, l'impedenza è la resistenza di uscita $r_{o1}$.
+    \item Verso M3, la corrente vede l'impedenza d'ingresso di un gate comune, quindi approssimabile a $1/g_{m3}$.
+\end{itemize}
+
+\noindent La corrente effettiva che riesce ad entrare in M3 è:
+
+$$i_{M3} = i_{d1} \cdot \frac{r_{o1}}{r_{o1} + \frac{1}{g_{m3}}} = i_{d1} \cdot \frac{g_{m3} r_{o1}}{1 + g_{m3} r_{o1}}$$
+
+\vspace{0.3cm}
+
+\noindent In un transistor polarizzato in regione di saturazione il prodotto $g_m r_o$ è tipicamente molto maggiore di 1; quindi il termine  $\frac{g_{m3} r_{o1}}{1 + g_{m3} r_{o1}}=\alpha$ tende a 1. Di conseguenza, solo una piccolissima frazione di corrente viene dispersa internamente attraverso $r_{o1}$, dunque:
+
+$$i_{M3} = \alpha \cdot i_{d1} \approx i_{d1}$$
+
+\noindent Questo stesso meccanismo di trasferimento quasi unitario si verifica nel ramo destro attraverso M4 e nello specchio di corrente NMOS inferiore.
+
+\noindent Se M1=M2 ($g_{m1}=g_{m2}$), M5=M6 e M7=M8 (rapporto di specchiatura 1:1), la corrente totale di corto circuito al nodo di uscita risulta essere:
+
+$$i_{out} \approx \left( g_{m1} \frac{v_{in}}{2} \right) - \left( -g_{m1} \frac{v_{in}}{2} \right) = g_{m1} \cdot v_{in}$$
+
+\section{Guadagno in tensione in DC $A_{v0}$}
+\label{chap:guadagno}
+
+Il nodo di uscita può essere modellato, in regime di piccoli segnali, come un generatore di corrente $i_{out} = g_{m1} \cdot v_{in}$ in parallelo alla resistenza equivalente $R_{out}$ vista guardando dal nodo di uscita verso il circuito, a ingressi spenti, come mostrato in figura \ref{fig:modello_norton_ota}.
+
+Un amplificatore come questo lavora tipicamente con un carico capacitivo, indicato come $C_L$ (che comprende anche le componenti parassite del layout). 
+
+\begin{figure}[htbp]
+    \centering
+    \begin{circuitikz}[american, thick]
+        
+        % Generatore di corrente pilotato (Norton) 
+        % "cI" disegna il rombo (generatore dipendente). Se preferisci il cerchio, usa "I".
+        \draw (0,0) to[cI, l=$g_{m1}v_{in}$] (0,3);
+        
+        % Linee orizzontali di collegamento superiore e inferiore
+        \draw (0,3) -- (3,3);
+        \draw (0,0) -- (3,0);
+        
+        % Resistenza di uscita Rout
+        \draw (1.5,3) to[R, l=$R_{out}$] (1.5,0);
+        
+        % Capacità di carico Cl
+        \draw (3,3) to[C, l=$C_L$] (3,0);
+        
+        % Terminale di uscita
+        \draw (3,3) -- (4,3) node[ocirc]{} node[right] {$v_{out}$};
+        
+        % Collegamento a massa inferiore comune
+        \draw (1.5,0) node[ground]{};
+        
+    \end{circuitikz}
+    \caption{Modello circuitale equivalente al nodo di uscita.}
+    \label{fig:modello_norton_ota}
+\end{figure}
+
+\noindent Quando si analizza il circuito in corrente continua o a frequenze relativamente basse, l'impedenza della capacità tende all'infinito ($Z_{C_L} = \frac{1}{j\omega C_L} \to \infty$), comportandosi quindi come un circuito aperto. In questa specifica condizione, l'intera corrente di piccolo segnale $i_{out}$ generata dall'amplificatore è forzata a scorrere in $R_{out}$; si definisce così il guadagno in continua ad anello aperto:
+
+
+
+$$A_{v0} = \frac{v_{out}}{v_{in}} = G_m \cdot R_{out} = g_{m1} \cdot R_{out}$$
+
+\vspace{0.3cm}
+
+ \noindent All'aumentare della frequenza del segnale d'ingresso, l'impedenza di $C_L$ diminuisce e il polo dominante dell'amplificatore comincia a farsi sentire, situato alla frequenza $\approx \frac{1}{2\pi R_{out} C_L}$; pertanto, l'espressione $g_{m1}R_{out}$ descrive il comportamento del circuito solo a basse frequenze.
+
+La resistenza equivalente $R_{out}$ si calcola come il parallelo tra la resistenza vista guardando dal nodo di uscita verso l'alto $R_{up}$ (verso $V_{DD}$ attraverso M4 e M2) e verso il basso $R_{down}$ (verso massa attraverso M6 e M8).
+
+In figura \ref{fig:rdown_model_final} è mostrato il modello per piccoli segnali quando si applica una tensione di prova $V_x$ sul nodo di uscita e si guarda verso M6 e M8.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{circuitikz}[american, thick]
+        
+        % ---------------------------------------------------
+        % 1. Gate M6 (AC Ground)
+        % ---------------------------------------------------
+        \draw (-1, 3.5) node[left] {$v_{g6} = 0$} node[ocirc]{} -- (0, 3.5) node[ground]{};
+        
+        % ---------------------------------------------------
+        % 2. Core del transistore M6 (ro6 e gm6)
+        % ---------------------------------------------------
+        % Ramo sinistro: resistenza di uscita r_o6
+        \draw (1, 5) to[R, l=$r_{o6}$] (1, 2);
+        
+        % Ramo destro: generatore pilotato g_m6
+        \draw (3, 5) to[cI, l=$g_{m6}v_{gs6}$] (3, 2);
+        
+        % Connessioni orizzontali Source (sotto) e Drain (sopra)
+        \draw (1, 5) -- (5, 5);
+        \draw (1, 2) -- (3, 2);
+        
+        % ---------------------------------------------------
+        % 3. Nodi di Drain e Source
+        % ---------------------------------------------------
+        \node[circ] at (2, 5) {};
+        \node[above] at (2, 5) {$v_{d6} = V_x$};
+        
+        \node[circ] at (2, 2) {};
+        \node[above right] at (2, 2) {$v_{s6}$};
+        
+        % ---------------------------------------------------
+        % 4. Generatore di prova Vx e corrente Ix
+        % ---------------------------------------------------
+        % Disegnato dall'alto (5,5) verso il basso (5,0) per avere il '+' in alto
+        \draw (5, 5) to[V, l=$V_x$] (5, 0) node[ground]{};
+        
+        % Freccia della corrente I_x che entra nel circuito da destra
+        \draw[->, >=stealth] (4.5, 5.2) -- (3.5, 5.2) node[midway, above] {$I_x$};
+        
+        % ---------------------------------------------------
+        % 5. Carico inferiore (Transistore M8) e suo Gate
+        % ---------------------------------------------------
+        % Resistenza r_o8 verso massa
+        \draw (2, 2) to[R, l=$r_{o8}$] (2, -1) node[ground]{};
+        
+        % Gate M8 (AC Ground) allineato sulla sinistra come per M6
+        \draw (-1, 0.5) node[left] {$v_{g8} = 0$} node[ocirc]{} -- (0, 0.5) node[ground]{};
+        
+    \end{circuitikz}
+    \caption{Modello circuitale equivalente per il calcolo di $R_{down}$.}
+    \label{fig:rdown_model_final}
+\end{figure}
+
+\noindent L'intera corrente $I_x$ attraverserà inevitabilmente la resistenza $r_{o8}$; il potenziale al source di M6 sarà:
+
+$$v_{s6} = I_x \cdot r_{o8}$$
+
+\noindent Poiché il gate di M6 è a massa:
+
+$$g_{m6}\cdot v_{gs6}=g_{m6}(v_{g6}-v_{s6})=g_{m6} (-I_xr_{o8})$$
+
+\vspace{0.3cm}
+
+\noindent La corrente $I_x$ al nodo di ingresso si divide nei due rami paralleli del modello di M6:
+
+\vspace{0.2cm}
+
+$$I_x = g_{m6} (-I_x r_{o8}) + \frac{V_x - I_x r_{o8}}{r_{o6}}$$
+
+\vspace{0.2cm}
+
+\noindent Da cui si ottiene che:
+
+$$R_{down} = \frac{V_x}{I_x} = r_{o6} + r_{o8} + g_{m6} r_{o6} r_{o8}\approx  g_{m6} r_{o6} r_{o8}$$
+
+\newpage
+
+\noindent In figura \ref{fig:rup_model_final} è mostrato il modello per piccoli segnali quando si applica una
+tensione di prova $V_x$ sul nodo di uscita e si guarda verso M4 e M2. Il circuito non tiene conto dell'effetto specchio M5/M6, che verrà trattato subito dopo.
+
+\vspace{0.3cm}
+\begin{figure}[htbp]
+    \centering
+    \begin{circuitikz}[american, thick]
+        
+        % ---------------------------------------------------
+        % 1. Generatore di prova Vx e corrente Ix
+        % ---------------------------------------------------
+        % Generatore Vx dal nodo di uscita (5,0) a massa (5,-2.5)
+        \draw (5, 0) to[V, l=$V_x$] (5, -2.5) node[ground]{};
+        
+        % Freccia della corrente I_x che entra nel circuito da destra
+        \draw[->, >=stealth] (4.5, 0.2) -- (3.5, 0.2) node[midway, above] {$I_x$};
+
+        % ---------------------------------------------------
+        % 2. Core del transistore M4 (ro4 e gm4)
+        % ---------------------------------------------------
+        % Ramo sinistro: resistenza di uscita r_o4
+        \draw (0, 3) to[R, l=$r_{o4}$] (0, 0);
+        
+        % Ramo destro: generatore pilotato g_m4 (freccia verso il basso: Source -> Drain)
+        \draw (2, 3) to[cI, l=$g_{m4}v_{sg4}$] (2, 0);
+        
+        % Gate M4 (AC Ground)
+        \draw (-2, 1.5) node[left] {$v_{g4} = 0$} node[ocirc]{} -- (-1, 1.5) node[ground]{};
+
+        % ---------------------------------------------------
+        % 3. Core del transistore M2 (ro2 e gm2)
+        % ---------------------------------------------------
+        % Ramo sinistro: resistenza di uscita r_o2
+        \draw (0, 6) to[R, l=$r_{o2}$] (0, 3);
+        
+        % Ramo destro: generatore pilotato g_m2 (freccia verso il basso: Source -> Drain)
+        \draw (2, 6) to[cI, l=$g_{m2}v_{sg2}$] (2, 3);
+        
+        % Gate M2 (AC Ground)
+        \draw (-2, 4.5) node[left] {$v_{g2} = 0$} node[ocirc]{} -- (-1, 4.5) node[ground]{};
+
+        % ---------------------------------------------------
+        % 4. Ramo di coda (Tail Node) verso massa AC (VDD)
+        % ---------------------------------------------------
+        % r_o9 verso l'alto, poi piega a destra verso la massa
+        \draw (0, 6) to[R, l=$r_{o9}$] (0, 8.5) -- (1, 8.5) node[ground]{};
+        
+        % 1/gm1 verso l'alto, poi piega a destra verso la massa
+        \draw (2, 6) to[R, l=$\frac{1}{g_{m1}}$] (2, 8.5) -- (3, 8.5) node[ground]{};
+
+        % ---------------------------------------------------
+        % 5. Connessioni Orizzontali e Nodi
+        % ---------------------------------------------------
+        % Linea Drain M4 (Uscita)
+        \draw (0, 0) -- (5, 0);
+        \node[circ] at (1, 0) {};
+        \node[below] at (1, 0) {};
+        
+        % Linea Source M4 / Drain M2
+        \draw (0, 3) -- (2, 3);
+        \node[circ] at (1, 3) {};
+        \node[above right] at (1, 3) {$v_{s4}$};
+        
+        % Linea Source M2 / Tail Node
+        \draw (0, 6) -- (2, 6);
+        \node[circ] at (1, 6) {};
+        \node[below right] at (1, 6) {$v_{s2}$};
+
+    \end{circuitikz}
+    \caption{Modello circuitale equivalente per il calcolo di $R_{up}$.}
+    \label{fig:rup_model_final}
+\end{figure}
+\noindent Il source di M2 vede verso massa la $r_{o9}$ di M9 in parallelo alla resistenza d'ingresso di uno stadio a gate comune (M1), pari a $\approx 1/g_{m1}$. Poiché $1/g_{m1}$ è tipicamente molto minore di $r_{o9}$, quasi tutta la corrente $I_x$ attraversa M1.
+
+La resistenza equivalente guardando verso drain di M2 è $R_{d2} = r_{o2} + (1 + g_{m2}r_{o2}) \frac{1}{g_{m1}}$ (stessi ragionamenti applicati per il calcolo di $R_{down}$). Poiché $g_{m1} = g_{m2}$ per simmetria, si ottiene $R_{d2} \approx 2r_{o2}$.
+
+Di conseguenza, la resistenza guardando nel drain del cascode M4 raddoppia rispetto a quella di un cascode standard ($R_{up\_std}$):
+
+$$R_{up} \approx g_{m4} r_{o4} (2 r_{o2}) = 2(g_{m4} r_{o4} r_{o2}) = 2R_{up\_std}$$
+
+\newpage 
+
+\noindent La corrente che fisicamente attraversa M4/M2 è:
+
+$$I_{x} = \frac{V_x}{2 R_{up\_std}}$$
+
+\vspace{0.3cm}
+\noindent Tuttavia, questa corrente $I_{x}$ attraversa anche M1, raggiunge il cascode
+M3 e il carico a diodo M5. Il transistor M6, specchiato con M5, viene forzato a tirare verso massa una corrente aggiuntiva:
+
+$$I_{mirror} = I_{x} = \frac{V_x}{2 R_{up\_std}}$$
+
+\vspace{0.4cm}
+\noindent Dunque, il generatore di prova $V_x$ deve fornire una corrente complessiva pari a:
+
+$$I_{x, up} = I_{x} + I_{mirror} = 2 I_{x}$$
+
+$$I_{x, up} = 2 \left( \frac{V_x}{2 R_{up\_std}} \right) = \frac{V_x}{R_{up\_std}}$$
+
+\vspace{0.3cm}
+
+\noindent La resistenza equivalente che tiene conto sia del ramo superiore che dell'effetto specchio M5/M6 risulta essere:
+
+$$R_{up\_eq} = \frac{V_x}{I_{x, up}} = R_{up\_std} = g_{m4} r_{o4} r_{o2}$$
+
+\vspace{0.3cm}
+
+\noindent La resistenza equivalente d'uscita complessiva $R_{out}$ è:
+
+$$R_{out} = R_{up\_eq} \parallel R_{down} = (g_{m4} r_{o4} r_{o2}) \parallel (g_{m6} r_{o6} r_{o8})$$
+
+\vspace{0.3cm}
+\noindent Da cui si ricava il guadagno in tensione in DC:
+
+$$A_{v0} = G_m \cdot R_{out} = g_{m1} \cdot ( (g_{m4} r_{o4} r_{o2}) \parallel (g_{m6} r_{o6} r_{o8}) )$$
+
+\chapter{Dimensionamento $W/L$}
+Il dimensionamento dei rapporti $W/L$ dei dispositivi è stato condotto sia per via analitica, sfruttando le equazioni di un modello semplificato del primo ordine, che attraverso simulazioni mirate su Cadence.
+\section{Coppia differenziale di ingresso: M1/M2}
+Il dimensionamento parte dalla coppia dei transistor d'ingresso, i PMOS M1 e M2. Si è partiti da una simulazione circuitale su Cadence. In figura \ref{fig:test_pmos} è mostrato il circuito di test.
+
+\vspace{0.3cm}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.7\textwidth]{immagini/test_pmos.png}
+    \caption{Circuito di test per il dimensionamento dei transistor M1 e M2 della coppia.}
+    \label{fig:test_pmos}
+\end{figure}
+
+
+\noindent È stato configurato il PMOS di test M0 a diodo, con il source connesso a $V_{DD}$; sul drain è stato applicato un generatore di corrente ideale verso massa da $25\mathrm{\mu A}$ (poiché in condizioni di riposo la $I_{ref}$ dell'OTA si divide equamente tra M1 e M2, ovvero $25 \mathrm{\mu A}$).
+
+\noindent Come visto nel capitolo precedente, la transconduttanza equivalente $G_m$ dell'OTA, con $M_1=M_2$, è $G_m=g_{m1}$. L'obiettivo è massimizzare il valore di $g_{m1}$ per garantire un elevato guadagno di tensione. Partendo dalle equazioni del primo ordine dei transistor, la transconduttanza è inversamente proporzionale alla tensione di overdrive $V_{OV}$:
+
+$$g_{m1} = \frac{2 I_{D1}}{V_{OV1}}$$
+
+\vspace{0.6cm}
+
+\noindent Dato che $I_D$ è fissata dal generatore di coda, per massimizzare $g_m$ è necessario ridurre la $V_{OV}$. È stata fissata una $L=1\mathrm{\mu m}$ in partenza per M1 e M2, in modo da evitare che gli effetti di canale corto diventino rilevanti ($L_{min}=0.18\mathrm{\mu m}$) e fare in modo che la $r_{o2}$ sia relativamente alta ($R_{out}$ dipende da $r_{o2}$).
+
+Per la scelta della $W$, è stata impostata la variabile \texttt{W\_par} (come $W$ del transistor di test M0) ed è stata effettuata un'analisi parametrica, facendo variare \texttt{W\_par} da $1\mathrm{\mu m}$ a $80\mathrm{\mu m}$; in figura \ref{fig:vdsat_w_p} è mostrata la $V_{DSAT}$ in funzione di \texttt{W\_par}.
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.85\textwidth]{immagini/vdsat_w_p.png}
+    \caption{$V_{DSAT}$ in funzione di \texttt{W\_par} (la W del transistor di test).}
+    \label{fig:vdsat_w_p}
+\end{figure}
+\newpage
+
+\noindent Come si evince dal grafico, la $V_{DSAT}$ diminuisce all'aumentare di \texttt{W\_par}; dunque la $g_m$ cresce con \texttt{W\_par}, come mostrato in figura \ref{fig:gm_w_p}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/gm_w_p.png}
+    \caption{$g_m$ in funzione di \texttt{W\_par} (la W del transistor di test).}
+    \label{fig:gm_w_p}
+\end{figure}
+
+\noindent Il problema è che all'aumentare di \texttt{W\_par} aumentano anche le capacità parassite intrinseche del dispositivo. In particolare, in figura \ref{fig:cgg_w_p} è mostrata la capacità totale di gate $C_{gg}$ in funzione di \texttt{W\_par}.
+
+
+\noindent È stata scelta $W=48\mathrm{\mu m}$ come trade-off, per avere una $|V_{DSAT}| \approx 130\mathrm{mV}$. 
+
+In regione di forte inversione (overdrive tipicamente superiori a $200\mathrm{mV}$) il trasporto di carica nel canale è dominato quasi interamente dal meccanismo di drift; in moderata e debole inversione, comincia a farsi sentire una forte componente diffusiva (comportamento simil BJT); quindi, a parità di corrente, si ha un'efficienza $g_m/I_D$ migliore rispetto alla forte inversione.
+\newpage
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/cgg_w_p.png}
+    \caption{$C_{gg}$ in funzione di \texttt{W\_par} (la W del transistor di test).}
+    \label{fig:cgg_w_p}
+\end{figure}
+
+
+\noindent Il secondo fattore critico che porta ad evitare la forte inversione è il Range di Modo Comune di Ingresso (ICMR), ossia l'intervallo di tensioni DC che possono essere applicate agli ingressi mantenendo tutti i transistor in regione di saturazione. Per una coppia differenziale con ingresso PMOS, il limite superiore dell'ICMR è dettato da: 
+
+$$V_{in,cm,max} = V_{DD} - |V_{DSAT9}| - |V_{thp1}|-|V_{OV1}|$$
+
+\vspace{0.4cm}
+
+\noindent Se M1 e M2 fossero stati in regime di forte inversione (es. $|V_{OV1}|=250\mathrm{mV}$), la dinamica del segnale di modo comune in ingresso sarebbe stata limitata.
+
+Un'altra considerazione può essere fatta in merito alla tensione di offset riferita all'ingresso $V_{OS}$, dovuta al mismatch delle tensioni di soglia $\Delta V_{th}$ di M1 e M2, a causa della variabilità intrinseca del processo produttivo.
+
+\newpage
+
+\noindent Dalla teoria, la deviazione standard di questo $\Delta V_{th}$ è inversamente proporzionale alla radice quadrata dell'area attiva di gate del transistor: 
+
+$$\sigma_{\Delta V_{th}} = \frac{A_{VT}}{\sqrt{W \cdot L}}$$
+
+\vspace{0.3cm}
+
+\noindent dove $A_{VT}$ è una costante dipendente dal processo tecnologico. Se M1 e M2 fossero stati in regime di forte inversione, a parità di $I_D$, si sarebbe dovuta scegliere una larghezza $W$ inferiore (rispetto a $48\mathrm{\mu m}$), quindi il prodotto $W \cdot L$ sarebbe stato più piccolo e $\sigma_{\Delta V_{th}}$ sicuramente peggiore.
+
+\section{Transistori di cascode della coppia: M3/M4}
+\label{sec:m3/m4}
+Per quanto riguarda M3 e M4, il ruolo di questi transistor è incrementare la resistenza differenziale di uscita, per garantire un elevato guadagno di tensione.
+
+A differenza di M1 e M2, un eventuale scostamento $\Delta V_{th}$ tra le soglie di M3 e M4 genera un errore che, se riportato all'ingresso dell'amplificatore, viene diviso per il guadagno intrinseco di M1 e M2 ($g_{m1} r_{o1}$); dunque, il contributo all'offset può considerarsi trascurabile.
+
+È comunque necessario mantenere una $V_{OV}$ bassa anche per M3 e M4. Si consideri la parte di circuito mostrata in figura \ref{fig:maglia_m2_m4}.
+
+\begin{figure}[htbp]
+    \centering
+    
+    \ctikzset{tripoles/mos style/arrows}
+    \ctikzset{tripoles/pmos style/nocircle}
+    
+    \begin{circuitikz}[american, thick]
+    
+    % ---------------------------------------------------
+    % Dettaglio Maglia M2 - M4
+    % ---------------------------------------------------
+    
+    % Nodo Source M2 (proveniente dal drain di M9)
+    \draw (0, 4.5) node[circ]{} node[above] {$V_{S2}$} -- (0, 3.5);
+    
+    % Transistor M2 (Coppia Differenziale)
+    % xscale=-1 sposta il gate a destra
+    \draw (0, 3) node[pmos, xscale=-1] (M2) {};
+    \node[align=center, left] at (-0.5, 3) {\scriptsize \textbf{M2}};
+    
+    % Connessione Gate M2 (V_in,cm)
+    \draw (M2.G) -- ++(1,0) node[ocirc]{} node[right] {$V_{in,cm}$};
+    
+    % Transistor M4 (Cascode)
+    \draw (0, 0) node[pmos] (M4) {};
+    \node[align=center, right] at (0.5, 0) {\scriptsize \textbf{M4}};
+    
+    % Connessione sicura tra Drain di M2 e Source di M4 (Risolve il glitch)
+    \draw (M2.D) -- (0, 1.5) -- (M4.S);
+    
+    % Nodo intermedio centrale
+    \node[circ] at (0, 1.5) {};
+    \node[right] at (0.2, 1.5) {$V_{D2} = V_{S4}$};
+    
+    % Connessione Gate M4 (Tensione di polarizzazione V_B)
+    \draw (M4.G) -- ++(-1,0) node[ocirc]{} node[left] {$V_B$};
+    
+    % Connessione Drain e nodo V_out
+    \draw (M4.D) -- ++(0,-1) coordinate (VoutNode);
+    \draw (VoutNode) node[circ]{} -- ++(1.5,0) node[ocirc]{} node[right] {$V_{out}$};
+    
+    % Freccia verso il basso per indicare che continua verso M6
+    \draw[-latex] (VoutNode) -- ++(0,-0.8) node[below] {(verso M6)};
+    
+    \end{circuitikz}
+    
+    \caption{Zoom sul circuito: M2 e M4.}
+    \label{fig:maglia_m2_m4}
+\end{figure}
+
+\noindent Affinché M4 (vale in modo speculare anche per M3) rimanga in saturazione, deve valere la condizione:
+
+$$|V_{DS4}| \ge |V_{DSAT4}| \approx |V_{OV4}|$$
+
+\vspace{0.3cm}
+
+\noindent Dato che $V_{S4}=V_B+V_{SG4}$ e $V_{D4}=V_{out}$, vale che:
+
+$$(V_B+V_{SG4})-V_{out}\ge |V_{OV4}|$$
+
+\vspace{0.3cm}
+
+\noindent Sapendo che $|V_{OV4}|=V_{SG4}-|V_{thp4}|$, si ha:
+
+$$V_{out}\le V_B+|V_{thp}|$$
+
+\vspace{0.3cm}
+
+\noindent Questo è il limite superiore dell'escursione di tensione in uscita (output voltage swing). Considerando il transistor M2, il suo source è $V_{S2}=V_{in,cm}+V_{SG2}$ e il suo drain è $V_{D2}=V_B+V_{SG4}$. Affinché M2 rimanga in saturazione, deve valere la condizione:
+
+$$(V_{in,CM}+V_{SG2})-(V_B+V_{SG4})\ge |V_{OV2}|$$
+
+\vspace{0.3cm}
+
+\noindent Da cui si ricava che:
+
+$$V_{in,CM} \ge V_B-|V_{thp2}|+V_{SG4}$$
+
+\vspace{0.4cm}
+
+\noindent Se si aumenta $V_B$, si migliora l'output swing, ma si peggiora il range di ingresso; se si diminuisce $V_B$, succede il contrario. L'unico modo per migliorare l'ICMR senza fare trade-off con l'uscita è ridurre la $V_{SG4}$. Ecco perché, anche per M3 e M4, è stato scelto di avere $130\mathrm{mV}$ di overdrive.
+
+Come nel caso di M1 e M2, è possibile aumentare la $W$ per avere un overdrive ancora più piccolo, tuttavia è necessario prestare attenzione alle capacità intrinseche che, inevitabilmente, tendono a peggiorare (l'argomento verrà approfondito nel capitolo dedicato al comportamento in frequenza).
+
+\section{Specchio di corrente di base del carico: M7/M8}
+
+Per il dimensionamento di M7 e M8, ovvero i transistor NMOS dello specchio cascode collegati a massa, è stato realizzato anche in questo caso un circuito di test dedicato su Cadence, mostrato in figura \ref{fig:test_nmos}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/test_nmos.png}
+    \caption{Circuito di test per il dimensionamento dei transistor M7 e M8.}
+    \label{fig:test_nmos}
+\end{figure}
+
+\noindent M0 è connesso a diodo, il source è a massa e sul drain è stato inserito un generatore di corrente ideale da $25\mathrm{\mu A}$ collegato a $V_{DD}$. È stata effettuata la stessa identica analisi parametrica eseguita per M1 e M2. In questo caso si è partiti fissando $L=2\mathrm{\mu m}$.
+
+La tensione di offset riferita all'ingresso $V_{OS,in}$, dovuta al mismatch delle tensioni di soglia $\Delta V_{thn}$ di M7 e M8, può essere espressa come:
+
+$$V_{OS,in}=\frac{g_{m8}}{g_{m1}}\Delta V_{thn}$$
+
+\vspace{0.4cm}
+
+\noindent Lo stesso fattore di attenuazione $g_{m8}/g_{m1}$ controlla anche il rumore termico di corrente riportato come tensione equivalente in ingresso:
+
+\vspace{0.1cm}
+
+$$\overline{v_{n,in8}^2} =\frac{4kT \gamma}{g_{m1}} \left( \frac{g_{m8}}{g_{m1}} \right)$$
+
+\vspace{0.3cm}
+\noindent dove $\gamma$ è il coefficiente di rumore termico del canale. Per fare in modo che il rumore e l'offset di M8 non distruggano il segnale in ingresso, sarebbe opportuno che $g_{m8} \ll g_{m1}$; per questo motivo, dalla simulazione parametrica di \texttt{W\_par}, è stato selezionato il valore di larghezza $W$ che garantisca un overdrive di $V_{OV7} \approx 200\mathrm{mV}$. Con $L=1\mathrm{\mu m}$, si ottiene $W = 4\mathrm{\mu m}$; l'area attiva del canale è $4\mathrm{\mu m^2}$. È stata fissata $L=2\mathrm{\mu m}$, con corrispondente $W = 8\mathrm{\mu m}$, per aumentare l'area. Inoltre, si attenua anche il fenomeno della modulazione della lunghezza di canale, ottenendo così una $r_{o8}$ più grande.
+
+\section{Transistori di cascode del carico: M5/M6}
+
+Per quanto riguarda i transistor NMOS M5 e M6, come discusso per i PMOS M3 e M4, hanno un contributo quasi nullo in termini di tensione di offset riferiti all'ingresso (perchè divisi per il prodotto $g_{m1}r_{o8}$). La lunghezza di canale è stata fissata a $L=1\mathrm{\mu m}$ per avere un'alta $r_{o6}$ senza aumentare eccessivamente l'area. Per quanto riguarda la scelta della $W$,     affinché M6 e M8 sul ramo di uscita rimangano in saturazione, $V_{out}$ non può scendere al di sotto di questo limite inferiore:
+
+$$V_{out} \ge V_{DSAT8} + V_{DSAT6} \approx V_{OV8} + V_{OV6}$$
+
+\vspace{0.3cm}
+
+
+\noindent Nel dimensionamento di M7 e M8, è stato necessario fissare una $V_{OV8} \approx 200\mathrm{mV}$; avendo già "speso" una porzione significativa di dinamica, è fondamentale comprimere al massimo la $V_{OV6}$ per evitare che lo swing del segnale in uscita si riduca drasticamente. Si è deciso dunque di impostare un overdrive $V_{OV6} \approx 100\mathrm{mV}$. Dall'analisi parametrica, è risultata una corrispondente larghezza $W = 20\mathrm{\mu m}$.
+
+\section{Specchio di corrente di coda: M9/M10}
+
+L'ultimo blocco da dimensionare è lo specchio di corrente PMOS superiore, formato dai transistor M9 e M10. M10 è connesso a diodo e riceve una corrente di riferimento $I_{ref}=50\mathrm{\mu A}$ da un generatore di corrente ideale. Per ottenere un rapporto di specchiatura 1:1, i due dispositivi sono stati progettati con dimensioni identiche.
+
+Il Rapporto di Reiezione di Modo Comune (CMRR) in continua dipende strettamente dalla resistenza di uscita del generatore di coda ($r_{o9}$). Tuttavia, come verrà mostrato nel capitolo dedicato al CMRR, la conversione single-ended di questa topologia presenta un'asimmetria strutturale intrinseca: l'impedenza vista dal ramo di sinistra (limitata dalla connessione a diodo) è diversa rispetto a quella del ramo di destra (alta impedenza del nodo di uscita). Questa asimmetria pone un limite insuperabile al CMRR, rendendo di fatto inefficace un aumento della $r_{o9}$.
+
+\noindent Dunque, il parametro più critico per il dimensionamento di M9 non è la $r_{o9}$, ma la capacità parassita totale del nodo di coda $C_{tail}$. Con $L=2\mathrm{\mu m}$, sarebbe necessaria una $W=192\mathrm{\mu m}$ per ottenere una $V_{OV9} \approx 130\mathrm{mV}$ (è necessario mantenere una tensione di overdrive bassa poiché $V_{OV9}$ limita l'ICMR). Con queste dimensioni, l'area della regione di canale è $384\mathrm{\mu m^2}$: $C_{tail}$ rischia di peggiorare drasticamente il CMRR in frequenza.
+
+Per questo motivo, è stata scelta per M9 e M10 una $L=1\mathrm{\mu m}$ e una corrispondente $W=96\mathrm{\mu m}$ (per ottenere $V_{OV9} \approx 130\mathrm{mV}$; rispetto a M1/M2, M9 deve erogare $50\mathrm{\mu A}$, ovvero il doppio della corrente).
+\chapter{Analisi e caratterizzazione}
+
+
+
+In figura \ref{fig:primo_circuito_cadence} è mostrato un primo schematico circuitale dell'amplificatore realizzato su Cadence, con i rapporti $W/L$ che sono stati dimensionati nel capitolo precedente. In questa prima versione, i terminali di bulk dei PMOS sono stati connessi tutti a $V_{DD}$, quelli degli NMOS a massa.
+
+
+
+\vspace{1.5cm}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/primo_circuito_cadence.png}
+    \caption{Prima versione dello schematico circuitale dell'amplificatore su Cadence.}
+    \label{fig:primo_circuito_cadence}
+\end{figure}
+
+\newpage
+
+\section{Tensione di polarizzazione $V_B$}
+\label{chap:vb}
+Il valore della tensione $V_{B}$, applicata sui gate dei transistor cascode PMOS M3/M4, non può essere scelto in modo arbitrario. Ci sono dei limiti fisici imposti dalla topologia, al di fuori dei quali il circuito perde le sue proprietà di amplificazione. L'obiettivo è quindi individuare l'intervallo di valori ammissibili per $V_B$, tali da garantire l'esistenza di almeno un valore di $V_{CM}$ per cui tutti i transistor operino in regione di saturazione.
+
+\subsection{Intervallo di valori ammissibili per $V_B$}
+
+Il primo paletto progettuale è dettato dalla necessità di mantenere il transistor cascode M3 in regione di saturazione. Si considera il ramo di sinistra dell'OTA, mostrato in figura \ref{fig:maglia_m3_m5_m7}.
+
+\begin{figure}[htbp]
+    \centering
+    
+    \ctikzset{tripoles/mos style/arrows}
+    \ctikzset{tripoles/pmos style/nocircle}
+    
+    \begin{circuitikz}[american, thick]
+    
+    % ---------------------------------------------------
+    % Dettaglio Ramo Sinistro: M3, M5, M7
+    % ---------------------------------------------------
+    
+    % Nodo Source M3 (proveniente dal drain di M1)
+    \draw (0, 4.5) node[circ]{} node[right] {$V_{S3}$} -- (0, 3.8);
+    \node[above] at (0, 4.5) {};
+    
+    % Transistor M3 (Cascode PMOS)
+    % xscale=-1 sposta il gate a destra per coerenza con il circuito completo
+    \draw (0, 3) node[pmos, xscale=-1] (M3) {};
+    \node[align=center, left] at (-0.5, 3) {\scriptsize \textbf{M3}};
+    
+    % Connessione Gate M3 (Tensione di polarizzazione V_B)
+    \draw (M3.G) -- ++(1.5,0) node[ocirc]{} node[right] {$V_B$};
+    
+    % ---------------------------------------------------
+    
+    % Transistor M5 (Carico Attivo a diodo NMOS)
+    \draw (0, 0) node[nmos, xscale=-1] (M5) {};
+    \node[align=center, left] at (-0.5, 0) {\scriptsize \textbf{M5}};
+    
+    % Connessione sicura tra Drain di M3 e Drain di M5
+    \draw (M3.D) -- (M5.D);
+    
+    % Nodo intermedio V_D3 (Mette in evidenza la formula del limite)
+    \node[circ] at (0, 1.5) {};
+    \node[left] at (-0.2, 1.5) {$V_{D3} = V_{GS5} + V_{GS7}$};
+    
+    % Connessione a diodo per M5 (Drain cortocircuitato al Gate)
+    \draw (M5.D) node[circ]{} -| (M5.G) node[circ]{};
+    
+    % ---------------------------------------------------
+    
+    % Transistor M7 (Specchio a diodo NMOS)
+    \draw (0, -3) node[nmos, xscale=-1] (M7) {};
+    \node[align=center, left] at (-0.5, -3) {\scriptsize \textbf{M7}};
+    
+    % Connessione tra Source di M5 e Drain di M7
+    \draw (M5.S) -- (M7.D);
+    
+    % Nodo intermedio V_D7
+    \node[circ] at (0, -1.5) {};
+    \node[left] at (-0.2, -1.5) {$V_{S5} = V_{D7} = V_{GS7}$};
+    
+    % Connessione a diodo per M7 (Drain cortocircuitato al Gate)
+    \draw (M7.D) node[circ]{} -| (M7.G) node[circ]{};
+    
+    % ---------------------------------------------------
+    
+    % Connessione a GND per M7
+    \draw (M7.S) -- ++(0,-0.5) node[ground]{};
+    
+    \end{circuitikz}
+    
+    \caption{Zoom sul circuito: M3/M5/M7}
+    \label{fig:maglia_m3_m5_m7}
+\end{figure}
+
+\noindent Il potenziale al drain di M3 $V_{D3}$ è fissato dal carico attivo sottostante. Poiché il ramo deve assorbire metà della corrente di coda, quindi $25\mathrm{\mu A}$, i transistor a diodo M5 e M7 fissano il nodo $V_{D3}$ a un potenziale pari alla somma delle sole tensioni gate-source:
+
+
+$$V_{D3} = V_{GS5} + V_{GS7}$$
+
+\vspace{0.3cm}
+\noindent Affinché M3 rimanga in saturazione, $V_{D3}$ non può salire oltre il potenziale di gate (dunque $V_{B}$) più la sua tensione di soglia $|V_{thp}|$:
+
+$$V_{D3} - V_B \le |V_{thp3}| \implies V_B \ge V_{D3} - |V_{thp3}|$$
+
+\vspace{0.3cm}
+
+\noindent Se $V_{B}$ scendesse al di sotto di questo valore, M3 verrebbe forzato in regione di triodo, distruggendo l'effetto cascode. Per individuare questo limite in modo rigoroso, è stata impostata una simulazione su Cadence con $V_{CM}=0.9\mathrm{V}$ ed eseguito uno sweep DC della variabile parametrica $V_B$. Per valutare il punto esatto in cui M3 entra in regione di triodo, tramite la Calculator di Cadence è stata tracciata la seguente espressione:
+\vspace{0.5cm}
+\begin{center}
+    \texttt{v("/M3" "vds" ?result "dc") - v("/M3" "vdsat" ?result "dc")}
+\end{center}
+\vspace{0.5cm}
+
+\noindent La figura \ref{fig:vb_vds_vdsat_0} mostra il grafico di questo margine al variare di $V_B$. 
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vb_vds_vdsat_0.png}
+    \caption{\texttt{v("/M3" "vds" ?result "dc") - v("/M3" "vdsat" ?result "dc")} tracciata su Cadence in funzione di $V_B$.}
+    \label{fig:vb_vds_vdsat_0}
+\end{figure}
+
+\noindent Poiché per i transistor PMOS il simulatore restituisce valori negativi per $V_{DS}$ e $V_{DSAT}$, la condizione di saturazione è verificata quando la differenza è un numero negativo. Il punto in cui la curva vale 0 (transizione tra triodo e saturazione) si ha in corrispondenza di $V_{B}=495\mathrm{mV}$. Questo è il valore minimo ammissibile per $V_B$.
+
+Passando adesso al valore massimo, come già accennato nella sezione dedicata al dimensionamento dei transistor cascode M3/M4 \ref{sec:m3/m4}, il valore di $V_B$ influisce direttamente sulla dinamica di ingresso del circuito, cioè l'ICMR. Per determinare il limite superiore ammissibile di $V_B$, è quindi necessario studiare come varia l'ICMR al variare di questa tensione di polarizzazione.
+
+A tale scopo, è stato realizzato uno specifico setup di simulazione su Cadence. Per estrarre il limite superiore e il limite inferiore dell'ICMR, la simulazione è stata strutturata in questi passaggi:
+
+\begin{itemize}
+    \item È stata impostata un'analisi parametrica per la variabile $V_B$. Per ogni valore assunto da $V_B$, il simulatore esegue internamente uno sweep DC della tensione di modo comune $V_{CM}$ (da $0$ a $1.8\text{ V}$).
+    
+    \item È stata utilizzata la funzione \texttt{cross} della Calculator. Questa funzione analizza la curva generata dallo sweep DC e restituisce un singolo valore: l'esatta $V_{CM}$ in cui il margine interseca lo zero, segnando il confine tra la regione di triodo e quella di saturazione.
+    
+    \item Il limite inferiore ($\mathrm{ICMR_{min}}$) è dettato dalla necessità di mantenere in saturazione la coppia differenziale M1/M2. Poiché per i dispositivi PMOS il simulatore valuta $V_{DS}$ e $V_{DSAT}$ come quantità negative, la condizione di saturazione risulta verificata quando il margine $V_{DS} - V_{DSAT}$ è minore o uguale a zero. Partendo da $V_{CM}=0$, i due transistor si trovano in triodo; all'aumentare di $V_{CM}$, i dispositivi transitano in saturazione, facendo passare il loro margine da positivo a negativo. È stata impostata la funzione \texttt{cross} per rilevare questo attraversamento (da positivo a negativo) su un fronte di discesa (\texttt{falling}):
+    \begin{center}
+        \texttt{cross((v("/M1" "vds" ?result "dc") - v("/M1" "vdsat" ?result "dc")) 0 1 "falling")}
+    \end{center}
+
+    \item Il limite superiore ($\mathrm{ICMR_{max}}$) è imposto dal transistor M9 del generatore di coda. Aumentando $V_{CM}$, il nodo di source della coppia viene spinto verso l'alto, comprimendo la $V_{DS}$ di M9 fino a portarlo in triodo (il margine passa da negativo a positivo). In questo caso, l'incrocio con lo zero va rilevato su un fronte di salita (\texttt{rising}):
+    \begin{center}
+        \texttt{cross((v("/M9" "vds" ?result "dc") - v("/M9" "vdsat" ?result "dc")) 0 1 "rising")}
+    \end{center}
+\end{itemize}
+
+
+
+\noindent In figura \ref{fig:icmr_max_min} sono mostrati $\mathrm{ICMR_{max}}$ e $\mathrm{ICMR_{min}}$ in funzione di $V_B$.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/icmr_max_min.png}
+    \caption{$\mathrm{ICMR_{max}}$ (in verde) vs $\mathrm{ICMR_{min}}$ (in rosso), in funzione di $V_B$.}
+    \label{fig:icmr_max_min}
+\end{figure}
+
+\noindent Deve valere la condizione:
+
+$$\mathrm{ICMR_{min}} < \mathrm{ICMR_{max}}$$
+
+\vspace{0.3cm}
+
+\noindent Il valore massimo di $V_B$ tale per cui la condizione è rispettata è $860\mathrm{mV}$. 
+\noindent Il crollo a parabola che si vede per l'$\mathrm{ICMR_{max}}$ è dovuto all'aumento di $V_B$, che spinge verso l'alto il potenziale di source di M3/M4 (ossia il drain di M1/M2). Questo schiaccia i transistor superiori, forzando la coppia differenziale e il generatore di coda M9 in regione di triodo. 
+
+\newpage
+
+\noindent L'effetto netto è che la corrente di coda, erogata da M9, crolla, come mostrato in figura \ref{fig:corrente_specchio_m9_m10_vb}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/corrente_specchio_m9_m10_vb.png}
+    \caption{Corrente di M9 (in verde) vs Corrente di M10 (in rosso), in funzione di $V_{B}$.}
+    \label{fig:corrente_specchio_m9_m10_vb}
+\end{figure}
+\noindent In rosso è rappresentata la corrente di M10, di $50\mathrm{\mu A}$ (non cambia di una virgola, perché c'è il generatore di corrente ideale $I_{ref}$ sul suo drain). In verde la corrente di M9.
+\newpage
+\section{Input Common-Mode Range e Output Voltage Swing}
+
+Dal capitolo precedente, si è visto che l'ICMR si stringe all'aumentare di $V_B$, come mostrato in figura \ref{fig:icmr_max_min_draw}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{immagini/icmr_max_min_draw.png}
+    \caption{$\mathrm{ICMR_{max}}$ (in verde) vs $\mathrm{ICMR_{min}}$ (in rosso), in funzione di $V_B$. In azzurro si evidenzia l'ampiezza del range.}
+    \label{fig:icmr_max_min_draw}
+\end{figure}
+
+\vspace{0.3cm}
+
+\noindent Anche la dinamica di uscita (Output Voltage Swing), ovvero l'escursione massima di tensione che il nodo di uscita $V_{out}$ può compiere senza forzare alcun transistor fuori dalla regione di saturazione, dipende da $V_B$. Si considera la parte inferiore del ramo di uscita, mostrata in figura \ref{fig:maglia_m4_m6_m8}. L'escursione è limitata fisicamente dai transistor NMOS M6 e M8. Per avere alto guadagno, entrambi i dispositivi devono operare in regione di saturazione. Pertanto, la tensione al nodo $V_{out}$ non può scendere al di sotto della somma delle $V_{DSAT}$ dei due transistor:
+
+$$V_{out} \ge V_{DSAT6} + V_{DSAT8}$$
+
+\vspace{0.3cm}
+\noindent Questo limite è indipendente dal valore di $V_B$.
+\begin{figure}[htbp]
+    \centering
+    
+    \ctikzset{tripoles/mos style/arrows}
+    \ctikzset{tripoles/pmos style/nocircle}
+    
+    \begin{circuitikz}[american, thick]
+    
+    % ---------------------------------------------------
+    % Dettaglio Ramo Destro: M4, M6, M8 e Vout
+    % ---------------------------------------------------
+    
+    % Nodo Source M4 (proveniente dal drain di M2)
+    \draw (0, 4.5) node[circ]{} node[right] {$V_{S4}$} -- (0, 3.8);
+    \node[above] at (0, 4.5) {};
+    
+    % Transistor M4 (Cascode PMOS)
+    \draw (0, 3) node[pmos] (M4) {};
+    \node[align=center, right] at (0.5, 3) {\scriptsize \textbf{M4}};
+    
+    % Connessione Gate M4 (Tensione di polarizzazione V_B)
+    \draw (M4.G) -- ++(-1.5,0) node[ocirc]{} node[left] {$V_B$};
+    
+    % ---------------------------------------------------
+    
+    % Nodo di Uscita Single-Ended (V_out)
+    \draw (M4.D) -- ++(0,-0.8) coordinate (VoutNode);
+    \draw (VoutNode) node[circ]{} -- ++(1.5,0) node[ocirc]{} node[right] {$V_{out}$};
+    
+    % ---------------------------------------------------
+    
+    % Transistor M6 (Carico Attivo a specchio NMOS)
+    \draw (0, 0) node[nmos] (M6) {};
+    \node[align=center, right] at (0.5, 0) {\scriptsize \textbf{M6}};
+    
+    % Connessione dal nodo Vout al Drain di M6
+    \draw (VoutNode) -- (M6.D);
+    
+    % Connessione Gate M6 (proveniente da M5)
+    \draw (M6.G) -- ++(-1.5,0) node[ocirc]{} node[left] {$V_{G6}$};
+    \node[above] at (-1, 0) {};
+    
+    % ---------------------------------------------------
+    
+    % Transistor M8 (Specchio di corrente NMOS inferiore)
+    \draw (0, -3) node[nmos] (M8) {};
+    \node[align=center, right] at (0.5, -3) {\scriptsize \textbf{M8}};
+    
+    % Connessione tra Source di M6 e Drain di M8
+    \draw (M6.S) -- (M8.D);
+    
+    % Connessione Gate M8 (proveniente da M7)
+    \draw (M8.G) -- ++(-1.5,0) node[ocirc]{} node[left] {$V_{G8}$};
+    \node[above] at (-1, -3) {};
+    
+    % ---------------------------------------------------
+    
+    % Connessione a GND per M8
+    \draw (M8.S) -- ++(0,-0.5) node[ground]{};
+    
+    \end{circuitikz}
+    
+    \caption{Zoom sul ramo di destra: M4/M6/M8}
+    \label{fig:maglia_m4_m6_m8}
+\end{figure}
+
+\noindent L'escursione dell'uscita è limitata superiormente dal transistor PMOS cascode M4. Affinché M4 rimanga in saturazione, il suo potenziale di drain ($V_{D4}=V_{out}$) non deve superare il potenziale di gate ($V_B$) più la tensione di soglia (questo vale se si assume che $V_{OV}=V_{DSAT}$):
+
+$$V_{out} \le V_B + |V_{thp4}|$$
+
+\vspace{0.3cm}
+\noindent È stato effettuato uno sweep DC della variabile $V_B$ e sono state definite sulla Calculator le espressioni per estrarre le curve dei due limiti.
+Per il limite inferiore:
+
+\begin{center}
+    \texttt{v("/M6" "vdsat" ?result "dc") + v("/M8" "vdsat" ?result "dc")}
+\end{center}
+
+\noindent Per il limite superiore:
+
+\begin{center}
+    \texttt{xval(v("/M4" "vth" ?result "dc")) - v("/M4" "vth" ?result "dc")}
+\end{center}
+
+\noindent In figura \ref{fig:vout_max_min} è mostrato l'andamento di questi due limiti in funzione di $V_B$. La distanza tra queste due curve rappresenta l'Output Swing. Rispetto all'ICMR, la dinamica dell'uscita cresce all'aumentare di $V_B$. 
+
+In modo analogo a quanto osservato per l'analisi dell'ICMR, per valori di $V_B$ eccessivamente alti si assiste a un crollo a parabola della curva del limite inferiore, mostrato in figura \ref{fig:vout_max_min_singolo}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{immagini/vout_max_min.png}
+    \caption{Limite inferiore (in rosso) e superiore (in giallo) della dinamica di uscita.}
+    \label{fig:vout_max_min}
+\end{figure}
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/vout_max_min_singolo.png}
+    \caption{Limite inferiore della dinamica di uscita (viene messo in risalto il crollo a parabola per $V_B$ alte).}
+    \label{fig:vout_max_min_singolo}
+\end{figure}
+
+\section{Guadagno di tensione}
+\label{chap:guadagno_ac}
+Si quantifica ora il guadagno di tensione in DC dell'amplificatore. In uscita è stata messa una capacità di carico $C_L=5\mathrm{pF}$.
+\noindent Per la polarizzazione del circuito, sono state fissate $V_B=0.7\mathrm{V}$ e $V_{CM}=0.9\mathrm{V}$. È stato applicato un segnale differenziale $V_D$ (+$V_D/2$ sul gate di M1, $-V_D/2$ sul gate di M2) ed è stato fatto uno sweep DC, facendo variare $V_D$ tra $-50\mathrm{mV}$ e $+50\mathrm{mV}$. 
+
+In figura \ref{fig:vout_vd} è mostrato il grafico della $V_{out}$ in funzione di $V_D$.
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_vd.png}
+    \caption{$V_{out}$ in funzione di $V_D$.}
+    \label{fig:vout_vd}
+\end{figure}
+
+
+
+\noindent Il guadagno del circuito corrisponde alla derivata della curva di $V_{out}$ rispetto a $V_D$. Nella zona ristretta attorno a $V_D=0\mathrm{V}$ il guadagno è massimo perché tutti i transistor si trovano a lavorare nella regione di saturazione. In figura \ref{fig:vout_vd_deriv} è mostrato il grafico di tale derivata.
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_vd_deriv.png}
+    \caption{Derivata di $V_{out}$ in funzione di $V_D$.}
+    \label{fig:vout_vd_deriv}
+\end{figure}
+
+\noindent Il valore in dB del picco risulta essere $\approx 69\mathrm{dB}$. Tuttavia, il picco non si ha in corrispondenza di $V_D=0\mathrm{V}$, ma di $V_D=-111\mathrm{\mu V}$, perché la conversione differenziale\slash single-ended (con carico a specchio di corrente) è intrinsecamente asimmetrica e introduce un offset sistematico. Infatti, imponendo $V_D=0\mathrm{V}$, il nodo di uscita non si posiziona perfettamente al centro della sua dinamica (Output Swing); di conseguenza, uno dei transistor del ramo di uscita subisce una parziale compressione della propria $V_{DS}$ e si allontana dal punto di massima $r_o$.
+
+\newpage
+\noindent In figura \ref{fig:vout_vd_deriv_max} è mostrato uno zoom della derivata di $V_{out}$ in prossimità del picco, a $V_D=-111\mathrm{\mu V}$.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_vd_deriv_max.png}
+    \caption{Derivata di $V_{out}$ in funzione di $V_D$. Zoom in prossimità del picco attorno a $V_D=0\mathrm{V}$.}
+    \label{fig:vout_vd_deriv_max}
+\end{figure}
+
+\noindent Per valutare il comportamento dinamico dell'amplificatore, quindi quantificare l'effetto dei nodi capacitivi sul guadagno, è stata impostata un'analisi AC. Questa simulazione tiene conto delle capacità intrinseche dei transistor, che introducono inevitabilmente dei poli nella funzione di trasferimento tra ingresso differenziale e uscita. È stata impostata un'ampiezza AC ("AC Magnitude" su Cadence) pari a $+0.5\mathrm{V}$ sul gate di M1 e di $-0.5\mathrm{V}$ sul gate di M2. Il punto di lavoro DC è rimasto $V_B=0.7\mathrm{V}$ e $V_{CM}=0.9\mathrm{V}$. È stato eseguito uno sweep in frequenza ed è stato tracciato il diagramma di Bode del modulo del guadagno dell'amplificatore, in dB, riportato in figura \ref{fig:gain}.
+
+\newpage
+
+\noindent Dall'analisi AC, il guadagno a basse frequenze risulta essere circa $65\mathrm{dB}$, contro i $69\mathrm{dB}$ dell'analisi precedente. Questa discrepanza è dovuta proprio all'asimmetria del circuito. L'analisi AC, infatti, linearizza il circuito valutando i parametri di piccolo segnale esattamente nel punto di lavoro $V_D=0\mathrm{V}$, dove il guadagno risulta essere inferiore. 
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/gain.png}
+    \caption{Diagramma di Bode del modulo del guadagno senza offset riportato all'ingresso.}
+    \label{fig:gain}
+\end{figure}
+
+
+\noindent Per questo motivo, è stata applicata sull'ingresso $V+$ una tensione di offset pari a $-111\mathrm{\mu V}$. In questo modo, l'analisi AC calcola un guadagno a basse frequenze di $69\mathrm{dB}$, come mostrato in figura \ref{fig:gain_real}.
+
+\newpage
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/gain_real.png}
+    \caption{Diagramma di Bode del modulo del guadagno con offset riportato all'ingresso.}
+    \label{fig:gain_real}
+
+\end{figure}
+
+
+
+
+\noindent La formula approssimativa del guadagno (ricavata nel capitolo \ref{chap:guadagno}) è:
+
+$$A_v = G_m \cdot R_{out} = g_{m1} \cdot ( (g_{m4} r_{o4} r_{o2}) \parallel (g_{m6} r_{o6} r_{o8}) )$$
+
+\vspace{0.3cm}
+
+\noindent Come si evince dalla formula, per incrementare il guadagno, si può aumentare la $g_{m1}$ (la $G_m$ dell'OTA), riducendo l'overdrive di M1/M2. Oppure, si può aumentare la resistenza differenziale di uscita $R_{out}$. 
+
+Dato che le resistenze differenziali dei transistor in saturazione $r_o$ dipendono dalla lunghezza di canale, è stata impostata un'analisi parametrica rispetto a $L$.
+
+È stata definita la variabile \texttt{L\_par} ed è stata assegnata, come lunghezza di canale, ai transistor M1/M2, M3/M4, M5/M6 e M7/M8.
+È stato mantenuto rigorosamente costante il rapporto $W/L$ di ogni dispositivo. Ciascuna larghezza $W$ è stata definita come una funzione dipendente dalla variabile globale \texttt{L\_par}. Per esempio, per i transistori della coppia differenziale M1/M2, è stata impostata una relazione $W=48\cdot \texttt{L\_par}$; per M5/M6 $W=20 \cdot \texttt{L\_par}$ e così via.
+
+
+ In figura \ref{fig:vout_vd_deriv_max_L} è mostrato l'andamento del guadagno DC in funzione della variabile \texttt{L\_par}. Come si evince dal grafico, il guadagno aumenta con \texttt{L\_par}.
+
+\vspace{1.5cm}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_vd_deriv_max_L.png}
+    \caption{Guadagno DC in funzione di \texttt{L\_par}.}
+    \label{fig:vout_vd_deriv_max_L}
+\end{figure}
+
+\newpage
+
+\noindent Se si annullasse l'effetto body, ponendo $V_{SB}=0$ per tutti i transistor (al contrario della configurazione originaria, in cui tutti i body dei PMOS sono a $V_{DD}$ e tutti quelli degli NMOS a massa), il guadagno in DC crolla a circa $62\mathrm{dB}$, come mostrato in figura \ref{fig:no_body_guadagno}. Dopo il polo dominante, le curve risultano pressoché sovrapponibili.
+
+\vspace{1.5cm}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/no_body_guadagno.png}
+    \caption{Diagrammi di Bode del modulo del guadagno nella configurazione iniziale (in verde) e con l'effetto body soppresso (in giallo).}
+    \label{fig:no_body_guadagno}
+\end{figure}
+
+\newpage
+
+\section{Margine di fase}
+
+In questo capitolo si analizza il comportamento dinamico dell'amplificatore, valutando i margini di stabilità. La capacità $C_L$ di uscita abbassa drasticamente la frequenza del polo dominante del sistema ($\approx \frac{1}{2\pi R_{out} C_L}$), riducendo la banda passante, ma risultando essenziale per la stabilità. 
+
+In figura \ref{fig:vout_vd_ac_carico} sono riportati i diagrammi di Bode del modulo e della fase del guadagno con $C_L$ connessa. Dalla simulazione si evince che, con le dimensioni geometriche $W/L$ scelte in fase di primo dimensionamento, il circuito presenta un margine di fase pari a $83^\circ$ (stabile nel punto di riposo, qualora l'OTA venisse chiuso in un anello di retroazione).
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_vd_ac_carico.png}
+    \caption{Diagramma di Bode del modulo e della fase del guadagno.}
+    \label{fig:vout_vd_ac_carico}
+\end{figure}
+
+\noindent Nel capitolo precedente, è stato dimostrato che per massimizzare il guadagno DC è possibile incrementare la resistenza di uscita $r_o$ dei transistor aumentando la loro lunghezza di canale $L$. Il problema è che un aumento di $L$ impone un incremento proporzionale della larghezza $W$ (per mantenere inalterati i rapporti $W/L$), comportando una crescita quadratica dell'area di gate ($W\cdot L$) dei dispositivi. La conseguenza inevitabile è l'aumento massiccio di tutte le capacità parassite intrinseche dei transistor; l'aumento di queste capacità interne spinge i poli non dominanti del circuito verso le basse frequenze; queste ultime, avvicinandosi alla frequenza del polo dominante, compromettono il margine di fase. Per quantificare questo fenomeno, in figura \ref{fig:margine_di_fase} è mostrato l'andamento del margine di fase al variare di \texttt{L\_par} (stessa analisi del capitolo precedente).
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/margine_di_fase.png}
+    \caption{Margine di fase in funzione di \texttt{L\_par}.}
+    \label{fig:margine_di_fase}
+\end{figure}
+
+
+\section{Risposta al Gradino e Slew Rate}
+
+Si testa ora l'amplificatore in configurazione closed-loop, chiudendo l'anello in retroazione unitaria (configurazione buffer). Si collega il nodo di uscita direttamente al terminale invertente $V-$ (gate di M2).
+
+È importante sottolineare che questa connessione modifica il carico capacitivo effettivo del circuito: alla capacità di carico nominale $C_L$ si somma in parallelo la capacità di ingresso del gate di M2. L'aggiunta di questa ulteriore capacità spinge il polo dominante verso frequenze ancora più basse; dunque, il margine di fase effettivo è addirittura migliore rispetto agli $83^\circ$ calcolati nel capitolo precedente.
+
+\noindent Al terminale non invertente $V+$ è stato applicato un segnale a gradino tramite un generatore \texttt{vpulse}, alla frequenza di $1\mathrm{MHz}$. I livelli di tensione alto/basso del gradino sono stati impostati a $0.9\mathrm{V}$ e $1\mathrm{V}$, perché con $V_B=0.7\mathrm{V}$ l'ICMR è limitato tra $870\mathrm{mV}$ e $1.03\mathrm{V}$. I tempi di salita e di discesa sono stati impostati a $t_{rise} = t_{fall} = 10\mathrm{ps}$.
+
+In figura \ref{fig:vout_gradino} sono mostrati \texttt{vpulse} ($0.9\mathrm{V}$--$1\mathrm{V}$) e $V_{out}$ nel tempo.
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_gradino.png}
+    \caption{\texttt{vpulse} $0.9\mathrm{V}$--$1\mathrm{V}$ (in rosso) e $V_{out}$ (in verde): risposta al gradino.}
+    \label{fig:vout_gradino}
+\end{figure}
+
+
+\noindent Per caratterizzare la risposta al gradino, è stato calcolato lo Slew Rate (SR): esso rappresenta la massima velocità di variazione temporale della tensione di uscita, ed è limitato dalla massima corrente disponibile $I_{max}$ per caricare e scaricare la capacità di carico $C_L$.
+
+Quando l'ingresso subisce una forte transizione differenziale, la coppia d'ingresso si sbilancia completamente: uno dei due rami va in interdizione e l'intera corrente $I_{tail}=I_{max}=50\mathrm{\mu A}$ va a caricare il nodo di uscita. Lo slew rate teorico si calcola in questo modo:
+
+$$SR = \frac{I_{SS}}{C_L} = \frac{50\ \mu\text{A}}{5\text{ pF}} = 10 \text{V}/\mu\text{s}$$
+
+\vspace{0.3cm}
+\noindent Nel caso di figura \ref{fig:vout_gradino}, la massima pendenza misurata è $\mathrm{7.3 V/\mu s}$. Tale valore risulta essere inferiore rispetto al limite teorico atteso di $\mathrm{10 V/\mu s}$.
+
+Questo perché, affinché la coppia sia completamente sbilanciata, quindi tutta la $I_{tail}$ sia dirottata su un singolo ramo, deve valere che:
+
+$$\Delta V_{in} \ge \sqrt{2}\cdot |V_{OV}|$$
+
+\vspace{0.3cm}
+\noindent Poiché il gradino di $0.9\mathrm{V}$--$1\mathrm{V}$ ($\Delta V_{in}=100\mathrm{mV}$) non è sufficientemente ampio da soddisfare questa condizione, la corrente erogata al carico è inferiore rispetto ai $50\mathrm{\mu A}$ disponibili.
+
+\noindent Al fine di misurare l'effetto dello slew rate puro (sbilanciamento completo), è stato applicato un gradino $0.4\mathrm{V}$--$1.2\mathrm{V}$ ($\Delta V_{in} = 800\mathrm{mV}$). Questa escursione supera deliberatamente i limiti dell'ICMR e dell'output swing. Dunque, agli estremi del transitorio, i dispositivi vengono forzati in regione di triodo, introducendo inevitabili distorsioni e prolungamento del tempo di assestamento finale.
+
+In figura \ref{fig:vout_gradino_big} sono mostrati \texttt{vpulse} ($0.4\mathrm{V}$--$1.2\mathrm{V}$) e $V_{out}$ nel tempo.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_gradino_big.png}
+    \caption{\texttt{vpulse} $0.4\mathrm{V}$--$1.2\mathrm{V}$ (in rosso) e $V_{out}$ (in verde): risposta al gradino.}
+    \label{fig:vout_gradino_big}
+\end{figure}
+
+\newpage
+
+\noindent In figura \ref{fig:vout_gradino_big_sr} è mostrato uno zoom del grafico di figura \ref{fig:vout_gradino_big}, mettendo in risalto i cursori per il calcolo dello SR. Il valore ottenuto è pari a $\mathrm{9.12V/\mu s}$.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/vout_gradino_big_sr.png}
+    \caption{Zoom della risposta al gradino ($0.4\mathrm{V}$--$1.2\mathrm{V}$) con cursori per la misura dello Slew Rate.}
+    \label{fig:vout_gradino_big_sr}
+\end{figure}
+
+
+\section{CMRR}
+Il Rapporto di Reiezione di Modo Comune (CMRR) quantifica la capacità del circuito di amplificare un segnale differenziale e di abbattere un segnale di modo comune. Il CMRR è definito come il rapporto in modulo tra il guadagno di tensione differenziale $A_{dm}$ ($A_v$ da \ref{chap:guadagno_ac}) e il guadagno di tensione di modo comune $A_{cm}$:
+
+$$
+CMRR = 20 \log_{10} \left| \frac{A_{dm}}{A_{cm}} \right|$$
+
+\vspace{0.5cm}
+
+\noindent Anche se ci fosse un generatore di coda ideale (resistenza infinita), le asimmetrie intrinseche del circuito single-ended fanno sì che esista sempre un guadagno di modo comune non nullo.
+
+\noindent Per calcolare il CMRR in frequenza, è stato estratto $A_{dm}$ secondo la metodologia già adottata nel capitolo \ref{chap:guadagno_ac}; per quanto riguarda $A_{cm}$, è stata impostata un'AC magnitude di +1V sia per $V+$ (sul gate di M1) che per $V-$ (sul gate di M2).
+
+In figura \ref{fig:cmrr_full} sono mostrati i diagrammi di Bode del modulo di $A_{dm}$, $A_{cm}$ e la risposta in frequenza del CMRR.
+
+\vspace{0.3cm}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/cmrr_full.png}
+    \caption{Diagrammi di Bode del modulo di $A_{dm}$, $A_{cm}$ e risposta in frequenza del CMRR.}
+    \label{fig:cmrr_full}
+\end{figure}
+
+
+\noindent Se si fosse scelta una lunghezza di canale $L$ più grande per M9 (es. $3\mathrm{\mu m}$, mantenendo il rapporto $W/L$ costante), la capacità parassita verso massa sarebbe peggiorata.
+\newpage
+
+
+\noindent In figura \ref{fig:cmrr_variabile_L} è mostrata la risposta in frequenza del CMRR per $L=1\mathrm{\mu m}, 3\mathrm{\mu m}, 10\mathrm{\mu m}, 50\mathrm{\mu m}$.
+ 
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/cmrr_variabile_L.png}
+    \caption{Risposta in frequenza del CMRR per $L=1\mathrm{\mu m}, 3\mathrm{\mu m}, 10\mathrm{\mu m}, 50\mathrm{\mu m}$.}
+    \label{fig:cmrr_variabile_L}
+\end{figure}
+
+\newpage
+\noindent In figura \ref{fig:cmrr_vs_ideale} sono mostrati i guadagni di modo comune $A_{cm}$ per $L=1\mathrm{\mu m}$ e per un setup con un generatore ideale da $50\mathrm{\mu A}$ che sostituisce lo specchio di corrente M9/M10. Nonostante la resistenza d'uscita idealmente infinita, $A_{cm}$ si scontra contro un tetto dovuto all'asimmetria del circuito.
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/cmrr_vs_ideale.png}
+    \caption{Diagrammi di Bode del modulo di $A_{cm}$ con $L=1\mathrm{\mu m}$ e con un generatore ideale di coda.}
+    \label{fig:cmrr_vs_ideale}
+\end{figure}
+
+\newpage
+
+\noindent In figura \ref{fig:cmrr_body} è mostrato un confronto tra la configurazione originaria e il setup con $V_{SB}=0$ per tutti i transistor.
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/cmrr_body.png}
+    \caption{Risposta in frequenza del CMRR con e senza effetto body.}
+    \label{fig:cmrr_body}
+\end{figure}
+\newpage
+
+\section{Offset}
+Il cascode telescopico è un circuito intrinsecamente asimmetrico. In assenza di segnale differenziale ($V_+ = V_-$), la corrente di coda si divide equamente nei due rami. Sul ramo di sinistra, i transistor NMOS connessi a diodo impongono un potenziale al drain di M3 pari alla somma delle rispettive tensioni gate-source $V_{D3} = V_{GS7} + V_{GS5}=1.111\mathrm{V}$. Affinché lo specchio replichi fedelmente la corrente sul ramo di destra, l'uscita $V_{out}$ tende naturalmente a collocarsi a $V_{out}=V_{D3}$.
+
+Tuttavia, il centro della dinamica ideale è diverso. Con $V_B = 0.7\mathrm{V}$, dal capitolo 4.1, l'uscita può variare tra 290mV e 1.2V (Output Swing), con un centro operativo ideale a 745mV. In anello aperto, dunque, l'amplificatore presenta una forte asimmetria: per posizionare l'uscita al centro della dinamica, l'OTA deve superare uno sbilanciamento in uscita di $\Delta V_{out} = 1.111\mathrm{V} - 0.745\mathrm{V} = 366\mathrm{mV}$.
+
+\vspace{0.7cm}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/offset_come_varia.png}
+    \caption{Offset sistematico riportato all'ingresso in funzione della lunghezza di canale $L$ di M1/M2, M3/M4, M5/M6 e M7/M8.}
+    \label{fig:offset_sistematico}
+\end{figure}
+
+\newpage
+
+\noindent L'offset sistematico ($V_{OS}$) è definito come la tensione differenziale che deve essere applicata all'ingresso per annullare questo sbilanciamento e portare l'uscita a metà dinamica. È pari allo sbilanciamento diviso per il guadagno ad anello aperto: 
+$$V_{OS} = \Delta V_{out} / A_v$$
+
+\noindent In figura \ref{fig:offset_sistematico} è mostrato come varia l'offset sistematico riportato all'ingresso in funzione della lunghezza di canale $L$ di M1/M2, M3/M4, M5/M6 e M7/M8.
+
+\vspace{0.8cm}
+\section{Errore di inseguimento}
+
+Quando l'amplificatore viene configurato a buffer a guadagno unitario, l'uscita viene cortocircuitata all'ingresso invertente ($V_{out} = V_-$). La $V_{out}$ ad anello aperto può essere espressa in questo modo:
+$$V_{out} = A_v \cdot (V_+ - V_-) + V_{D3}$$
+
+\noindent Sostituendo la condizione di buffer ($V_- = V_{out}$), si ottiene:$$V_{out} = A_v \cdot (V_+ - V_{out}) + V_{D3}$$Isolando $V_{errore} = V_+ - V_{out}$, la formula diventa:$$V_{errore} = \frac{V_+ - V_{D3}}{A_v + 1} \approx \frac{V_{out} - V_{D3}}{A_v}$$
+
+\noindent L'errore di inseguimento è pari allo sbilanciamento dell'uscita rispetto a $V_{D3}$ diviso l'altissimo guadagno. Non è una costante, ma dipende da quanto l'uscita $V_{out}$ (e quindi da $V_+$) si allontana da $V_{D3}$.
+
+\newpage 
+\noindent La figura \ref{fig:offset_inseguimento} mostra l'andamento dell'errore di inseguimento moltiplicato per 1000 (che nei grafici, durante la fase di simulazione, è stato indicato come "offset" inteso come "offset ad anello chiuso"; sostanzialmente indica quanto sia ideale il cortocircuito virtuale) in funzione di $V_+$. 
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/offset.png}
+    \caption{Errore di inseguimento moltiplicato per 1000.}
+    \label{fig:offset_inseguimento}
+\end{figure}
+
+\noindent Con $V_B=0.7\mathrm{V}$, l'ICMR si attesta tra 871mV e 1.03V (da figura \ref{fig:icmr_max_min}). Avvicinandosi al limite inferiore, 871mV, l'errore peggiora progressivamente (ancor prima del superamento del limite matematico $|V_{DS}| \le |V_{DSAT}|$; questo perché, in prossimità del "ginocchio" della caratteristica di uscita di un MOSFET, al passaggio da saturazione a triodo, la resistenza di uscita $r_o$ degrada progressivamente). 
+Oltre la soglia di 1.03V, l'errore sembra non peggiorare. In realtà, M9 del generatore di coda è entrato in triodo, come mostrato in figura \ref{fig:offset_i} (la corrente $I_{tail}$ crolla). Nonostante il crollo della corrente $I_{tail}$, il guadagno resta sufficientemente grande da mascherare il problema.
+
+\newpage
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/offset_i.png}
+    \caption{Errore di inseguimento moltiplicato per 1000 (in rosso) e $I_{tail}$ (in verde).}
+    \label{fig:offset_i}
+\end{figure}
+\noindent L'offset si annulla quando $V_{out}=V_+=V_{D3}=1.111\mathrm{V}$. In figura \ref{fig:offset_0} è mostrato uno zoom della curva dell'errore in funzione di $V_+$. In realtà, lo zero si ha in corrispondenza di $V_+=1.08\mathrm{V}$. Questo scostamento di $\approx \mathrm{30mV}$ (da 1.111V) certifica il superamento dell'ICMR: oltre 1.03V, l'ingresso in triodo di M9 riduce la corrente di coda; la minore densità di corrente sui carichi attivi M5 e M7 diminuisce le tensioni $V_{GS}$ necessarie per la conduzione; di conseguenza, il circuito ricalibra il proprio punto di riposo verso il basso, collocando il nuovo $V_{D3}$ a 1.08V.
+
+\newpage
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{immagini/offset_0.png}
+    \caption{Errore di inseguimento moltiplicato per 1000, zoom in prossimità del punto di zero.}
+    \label{fig:offset_0}
+\end{figure}
+
+\section{Rumore}
+
+L'analisi del rumore è stata condotta valutando la densità spettrale di ampiezza del rumore riportato all'ingresso (Input-Referred Noise), in $\text{V}/\sqrt{\text{Hz}}$.
+
+
+\noindent In figura \ref{fig:rumore} è mostrato lo spettro in frequenza di questo rumore. A basse frequenze, domina il rumore Flicker $1/f$; ad alte frequenze lo spettro si appiattisce: domina il rumore termico.
+
+Durante la fase di dimensionamento, è stata impostata una $g_{m7}<g_{m1}$ per minimizzare il rumore termico introdotto dallo specchio di carico M7/M8. In figura \ref{fig:summary} è mostrato il \textit{Noise Summary} a 5MHz. A questa frequenza si è abbondantemente oltre la frequenza di ginocchio del rumore Flicker, ma allo stesso tempo ben prima della frequenza a guadagno unitario (il guadagno di anello aperto residuo è di circa 10dB).
+
+
+Come si evince dai risultati del \textit{Noise Summary} di Cadence, i transistor di ingresso M1/M2 rappresentano la sorgente dominante di rumore termico (parametro \texttt{id}), contribuendo ciascuno per circa il 26\%. Il contributo di M7/M8 si piazza intorno al 21\%. In accordo con l'analisi teorica, i transistor di cascode M3/M4 risultano di fatto ininfluenti.
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/rumore.png}
+    \caption{Densità spettrale di ampiezza del rumore riportato all'ingresso.}
+    \label{fig:rumore}
+\end{figure}
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/summary.png}
+    \caption{Noise Summary a 5MHz.}
+    \label{fig:summary}
+\end{figure}
+
+\chapter{Layout}
+Analizzando la topologia, appare evidente che non tutti i transistor abbiano la stessa sensibilità al mismatch (cioè come le variazioni statistiche dei parametri dei transistor degradano le prestazioni del circuito). È stato effettuato un matching più o meno robusto in base proprio a questa sensibilità e si è scelto di utilizzare solo due livelli di metal (Metal 1 e Metal 2), minimizzando le capacità parassite per accoppiamento verticale. 
+
+Il mismatch della coppia M1/M2 si riflette direttamente sull'ingresso come tensione di offset: sono i dispositivi più sensibili. Per questo motivo, è stata adottata una struttura a centroide comune 2D interdigitata. È stato implementato il pattern geometrico mostrato in figura \ref{fig:common_centroid_pattern}, con dummy:
+
+\vspace{0.5cm}
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+        % Creazione della griglia usando una matrice di nodi
+        \matrix (M) [
+            matrix of nodes,
+            nodes in empty cells,
+            nodes={draw, minimum width=0.9cm, minimum height=2cm, anchor=center, font=\large\bfseries},
+            column sep=-\pgflinewidth,
+            row sep=-\pgflinewidth
+        ] {
+            % Prima riga con Dummy ai bordi
+            |[fill=gray!20]| D & |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & 
+            |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & |[fill=gray!20]| D \\
+            % Seconda riga con Dummy ai bordi
+            |[fill=gray!20]| D & |[fill=red!15]| B & |[fill=blue!15]| A & |[fill=blue!15]| A & |[fill=red!15]| B & 
+            |[fill=red!15]| B & |[fill=blue!15]| A & |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=gray!20]| D \\
+        };
+    \end{tikzpicture}
+    \caption{Struttura geometrica per M1 (A) e M2 (B).}
+    \label{fig:common_centroid_pattern}
+\end{figure}
+
+\vspace{0.3cm}
+
+\noindent Grazie a questa disposizione, i gradienti lineari di processo o di temperatura si elidono, almeno in parte. I dispositivi sono stati frazionati in 8 finger ciascuno, per minimizzare le capacità parassite di giunzione e ridurre la resistenza serie del gate ($W_{finger}=6\mathrm{\mu m}$). La capacità di giunzione parassita è data dalla somma del contributo di area di fondo e di perimetro: il frazionamento con condivisione delle diffusioni riduce l'area e il perimetro dei nodi di drain sensibili. Inoltre, la matrice 2D assicura che M1 ed M2 abbiano lo stesso numero di diffusioni di drain, eliminando asimmetrie capacitive che introdurrebbero doppietti polo-zero nella funzione di trasferimento.
+
+Nella realtà, i gradienti non sono perfettamente lineari, ma formano delle curve: scegliere un pattern più "largo" (come A B B A, 2 finger ciascuno) rispetto a quello presentato, significa campionare la curva in modo più grossolano. Inoltre, se ci fosse una minuscola impurità o difetto, usare finger grandi significa rischiare che l'impurità colpisca uno solo dei due dispositivi.
+
+\noindent In figura \ref{fig:m1_m2} è mostrato il layout per M1 e M2.
+
+\vspace{1cm}
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/m1_m2.png}
+    \caption{Layout per M1 e M2.}
+    \label{fig:m1_m2}
+\end{figure}
+
+\newpage
+
+\noindent Subito dopo la coppia d'ingresso, i dispositivi più critici per il mismatch sono i transistor dello specchio di carico M7 e M8. Qualsiasi asimmetria in questa coppia introduce un errore di corrente tra i due rami che si riflette all'ingresso come tensione di offset. Si è deciso di dedicare loro un matching robusto, ma leggermente meno aggressivo rispetto alla coppia d'ingresso. È stata adottata una struttura a centroide comune 1D disposta su un'unica riga, implementando il pattern geometrico di figura \ref{fig:common_centroid_1d}.
+
+\vspace{0.4cm}
+
+% --- DA INSERIRE NEL TESTO ---
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+        % Creazione della griglia usando una matrice di nodi
+        \matrix (M) [
+            matrix of nodes,
+            nodes in empty cells,
+            nodes={draw, minimum width=0.9cm, minimum height=2cm, anchor=center, font=\large\bfseries},
+            column sep=-\pgflinewidth,
+            row sep=-\pgflinewidth
+        ] {
+            % Prima riga con Dummy ai bordi
+            |[fill=gray!20]| D & |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & 
+            |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & |[fill=gray!20]| D \\
+        };
+    \end{tikzpicture}
+    \caption{Struttura geometrica per M7 (A) e M8 (B).}
+    \label{fig:common_centroid_1d}
+\end{figure}
+
+\vspace{0.3cm}
+
+\noindent In figura \ref{fig:m7_m8} è mostrato il layout per M7 e M8. I due transistor pilotano un numero diverso di sacche di drain; tuttavia, la bassa impedenza dei nodi dello specchio ($\approx 1/g_m$) spinge i relativi poli parassiti a frequenze molto alte, rendendo del tutto trascurabile l'effetto sulla dinamica del circuito.
+
+\vspace{0.5cm}
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/M7_M8.png}
+    \caption{Layout per M7 e M8.}
+    \label{fig:m7_m8}
+\end{figure}
+
+\vspace{0.3cm}
+
+\noindent Per quanto riguarda i transistor dello specchio di corrente di coda M9 e M10 ($W_{tot} = 96\mathrm{\mu m}$), il loro frazionamento in finger multipli ($W_{finger} = 6\mathrm{\mu m}$) è stato un passaggio obbligato per contenere la resistenza di gate e le capacità parassite di giunzione. Sebbene un mismatch tra M9 e M10 non generi alcun offset all'ingresso differenziale, un'eccessiva asimmetria tra i due dispositivi dovuta a gradienti di processo o termici potrebbe compromettere l'intero design. Ad esempio, una deviazione rilevante della corrente di coda effettiva rispetto al valore nominale di $50\mathrm{\mu A}$, modificherebbe pesantemente i punti di lavoro di tutti i transistor, degradando possibilmente i parametri discussi in fase di dimensionamento, come l'ICMR, l'Output Swing e il guadagno. Per garantire robustezza del punto di lavoro e copiare la giusta corrente di coda, si è scelto di riutilizzare il pattern geometrico 1D già utilizzato per gli altri transistor, risparmiando così tempo.
+
+\newpage
+
+\noindent La struttura geometrica è mostrata in figura \ref{fig:common_centroid_1d_extended}.
+
+% --- DA INSERIRE NEL TESTO ---
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}
+        % Creazione della griglia usando una matrice di nodi
+        \matrix (M) [
+            matrix of nodes,
+            nodes in empty cells,
+            % Dimensioni ridotte (0.85cm) per far stare 16 elementi nella pagina
+            nodes={draw, minimum width=0.85cm, minimum height=2cm, anchor=center, font=\large\bfseries},
+            column sep=-\pgflinewidth % Unisce i bordi delle celle
+        ] {
+            % Riga estesa da 16 elementi
+           |[fill=gray!20]| D & |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & 
+            |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & 
+            |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & 
+            |[fill=blue!15]| A & |[fill=red!15]| B & |[fill=red!15]| B & |[fill=blue!15]| A & |[fill=gray!20]| D \\
+        };
+    \end{tikzpicture}
+    \caption{Struttura geometrica per M9 (A) e M10 (B).}
+    \label{fig:common_centroid_1d_extended}
+\end{figure}
+
+\noindent In figura \ref{fig:m9_m10} è mostrato il layout per M9 e M10.
+\vspace{0.5cm}
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{immagini/m9_m10.png}
+    \caption{Layout per M9 e M10.}
+    \label{fig:m9_m10}
+\end{figure}
+
+\newpage
+
+\noindent Per quanto riguarda le coppie M3/M4 e M5/M6, si è scelto di non implementare alcuna struttura di matching. Qualsiasi variazione della tensione di soglia dovuta alla variabilità di processo genera una corrente di errore che, se riportata all'ingresso differenziale, viene attenuata dal guadagno intrinseco ($g_m r_o$) dei transistor. I dispositivi sono stati semplicemente frazionati in finger. Nelle figure \ref{fig:m3_m4} e \ref{fig:m5_m6} sono mostrati i layout per queste due coppie.
+
+\vspace{0.5cm}
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{immagini/m3_m4.png}
+    \caption{Layout per M3 e M4.}
+    \label{fig:m3_m4}
+\end{figure}
+
+\vspace{0.5cm}
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{immagini/m5_m6.png}
+    \caption{Layout per M5 e M6.}
+    \label{fig:m5_m6}
+\end{figure}
+
+\newpage
+
+\noindent In figura \ref{fig:layout_completo} è mostrato il layout completo della coppia differenziale.
+
+
+\vspace{2cm}
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/full_layout.png}
+    \caption{Layout completo.}
+    \label{fig:layout_completo}
+\end{figure}
+
+\section{Verifica del layout}
+Il primo step di validazione è stato il DRC. Questo strumento analizza le geometrie disegnate nel layout e verifica che i vincoli di fabbricazione imposti dalla fonderia siano stati rispettati. In figura \ref{fig:drc} è mostrata la schermata di esito positivo del DRC.
+
+
+\vspace{0.5cm}
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/drc}
+    \caption{Verifica DRC.}
+    \label{fig:drc}
+\end{figure}
+
+\noindent Segue la realizzazione dello schematico circuitale che verrà confrontato con il layout. Ogni singolo finger è stato istanziato come un transistor indipendente e i terminali di tutti questi dispositivi "frammentati" sono stati connessi in parallelo. Sono stati posizionati i pin di I/O ($V_{DD},\mathrm{GND},V_+,V_-,V_B$ e $I_{ref}$). Lo schematico è mostrato in figura \ref{fig:full_schematico_m}.
+
+Si è passati poi all'LVS (Layout Versus Schematic), un tool che estrae una netlist dal layout e la confronta con la netlist generata dallo schematico. In figura \ref{fig:lvs} è mostrato l'esito dell'LVS.
+
+L'ultimo passaggio è stato l'RCX: analizza la geometria del layout e genera una vista extracted, che è essenzialmente una copia del circuito con migliaia di capacità parassite.
+\newpage
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/full_schematico_m.png}
+    \caption{Schematico per LVS.}
+    \label{fig:full_schematico_m}
+\end{figure}
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.7\textwidth]{immagini/lvs.png}
+    \caption{Verifica LVS.}
+    \label{fig:lvs}
+\end{figure}
+
+\newpage
+
+\noindent In figura \ref{fig:simulazione} è mostrato il symbol della coppia, pronta per essere simulata.
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/simulazione.png}
+    \caption{Symbol della coppia.}
+    \label{fig:simulazione}
+\end{figure}
+
+\noindent Le figure seguenti mostrano il confronto tra il testbench ideale (in rosso, schematico \ref{fig:primo_circuito_cadence}) e quello contenente la vista estratta (in giallo, RCX), per la quale è stato generato l'apposito symbol.
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/confronto_gain_c.png}
+    \caption{Diagramma di Bode del modulo del guadagno con capacità di carico $C_L=5 \mathrm{pF}$. I grafici sono praticamente sovrapponibili: il polo a bassa frequenza domina e maschera le differenze.}
+    \label{fig:confronto_gain_c}
+\end{figure}
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/confronto_gain.png}
+    \caption{Diagramma di Bode del modulo del guadagno senza capacità di carico.}
+    \label{fig:confronto_gain}
+\end{figure}
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/confronto_fase_c.png}
+    \caption{Diagramma di Bode della fase del guadagno con capacità di carico $C_L=5 \mathrm{pF}$.}
+    \label{fig:confronto_fase_c}
+\end{figure}
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/confronto_fase.png}
+    \caption{Diagramma di Bode della fase del guadagno senza capacità di carico.}
+    \label{fig:confronto_fase}
+\end{figure}
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/cmrr_confronto_2.png}
+    \caption{Diagramma di Bode del modulo del CMRR con capacità di carico $C_L=5 \mathrm{pF}$.}
+    \label{fig:confronto_cmrr}
+\end{figure}
+
+\newpage
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{immagini/confronto_gradino.png}
+    \caption{Risposta al gradino (configurazione buffer) con capacità di carico $C_L=5 \mathrm{pF}$.}
+    \label{fig:confronto_gradino}
+\end{figure}
+
+\newpage
+
+\chapter{Analisi corner e deriva termica}
+
+I modelli dei transistor vengono valutati agli estremi delle variazioni statistiche di processo: SS (Slow-Slow, minima mobilità per NMOS e PMOS), FF (Fast-Fast, massima mobilità), SF (Slow NMOS, Fast PMOS) e FS (Fast NMOS, Slow PMOS). Invece, TT (Typical-Typical) è il caso nominale di riferimento. Nelle figure \ref{fig:corner_guadagno}, \ref{fig:corner_cmrr} e \ref{fig:corner_fase} sono mostrati alcuni confronti tra i vari corner.
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/corner_guadagno.png}
+    \caption{Diagramma di Bode del modulo del guadagno ad anello aperto per l'analisi corner (il valore della tensione di offset applicato all'ingresso è stato ricalibrato per ciascun corner).} 
+    \label{fig:corner_guadagno}
+\end{figure}
+
+\newpage 
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/corner_fase.png}
+    \caption{Diagramma di Bode della fase del guadagno ad anello aperto per l'analisi corner.} 
+    \label{fig:corner_fase}
+\end{figure}
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/corner_cmrr.png}
+    \caption{Risposta in frequenza del CMRR per l'analisi corner.} 
+    \label{fig:corner_cmrr}
+\end{figure}
+
+\newpage
+
+
+
+\noindent Anche la temperatura altera i parametri fisici dei transistor. Per esempio, all'aumentare della temperatura, la mobilità si riduce per scattering, portando ad un calo della transconduttanza. Dalla figura \ref{fig:corner_guadagno}, il caso SS è emerso come worst-case in termini di guadagno DC. È stato selezionato proprio questo corner SS come base per condurre simulazioni termiche a $-40^\circ\text{C}$ e $125^\circ\text{C}$ (la temperatura nominale di progetto era pari a $27^\circ\text{C}$). In figura \ref{fig:guadagno_ss_temp} è mostrato il diagramma di Bode del modulo del guadagno ad anello aperto nel caso SS, in corrispondenza dei due estremi termici. Nelle figure \ref{fig:fase_ss_temp} e \ref{fig:cmrr_ss_temp} sono mostrati analogamente fase e CMRR.
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/guadagno_ss_temp.png}
+    \caption{Diagramma di Bode del modulo del guadagno ad anello aperto nel caso SS a $-40^\circ\text{C}$ e $125^\circ\text{C}$.} 
+    \label{fig:guadagno_ss_temp}
+\end{figure}
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/fase_ss_temp.png}
+    \caption{Diagramma di Bode della fase del guadagno ad anello aperto nel caso SS a $-40^\circ\text{C}$ e $125^\circ\text{C}$.} 
+    \label{fig:fase_ss_temp}
+\end{figure}
+
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=1\textwidth]{immagini/cmrr_ss_temp.png}
+    \caption{Risposta in frequenza del CMRR nel caso SS a $-40^\circ\text{C}$ e $125^\circ\text{C}$.} 
+    \label{fig:cmrr_ss_temp}
+\end{figure}
+
+\newpage
+\begin{table}[!htb]
+    \centering
+    \begin{tabular}{ll}
+    
+        \midrule
+        Tensione di alimentazione ($V_{DD}$) & $1.8\,\mathrm{V}$ \\
+        Corrente di coda ($I_{tail}$) & $50\,\mathrm{\mu A}$ \\
+        Capacità di carico ($C_L$) & $5\,\mathrm{pF}$ \\
+        Tensione di polarizzazione cascode ($V_B$) & $0.7\,\mathrm{V}$ \\
+        Tensione di modo comune nominale ($V_{CM}$) & $0.9\,\mathrm{V}$ \\
+        Guadagno in continua ($A_{v0}$) & $69\,\mathrm{dB}$ \\
+        Margine di fase (con $C_L=5\,\mathrm{pF}$) & $83^\circ$ \\
+        CMRR in continua & $53\,\mathrm{dB}$ \\
+        ICMR ($V_B = 0.7\,\mathrm{V}$) & $871\,\mathrm{mV} - 1.03\,\mathrm{V}$ \\
+        Output Voltage Swing ($V_B = 0.7\,\mathrm{V}$) & $290\,\mathrm{mV} - 1.20\,\mathrm{V}$ \\
+        Offset sistematico riportato all'ingresso & $-111\,\mathrm{\mu V}$ \\
+        Slew Rate & $9.12\,\mathrm{V/\mu s}$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Tabella riassuntiva delle prestazioni dell'amplificatore.}
+    \label{tab:summary_prestazioni}
+\end{table}
+
+\end{document}
+

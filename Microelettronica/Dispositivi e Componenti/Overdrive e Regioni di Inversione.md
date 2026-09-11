@@ -72,15 +72,78 @@ L'indice di merito **$g_m / I_D$** (efficienza di transconduttanza) guida il dim
 
 👉 Approfondimento sulla variabilità: [Matching e Variabilità nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)
 
+
+---
+
+### 4. La Caratteristica $I_D - V_{GS}$ a $V_{DS}$ Fissato: Perché prima Parabola e poi Retta?
+
+Quando tracciamo la caratteristica di trasferimento $I_D(V_{GS})$, la tensione $V_{DS}$ viene mantenuta **costante**. A seconda del valore scelto per $V_{DS}$, il comportamento cambia radicalmente:
+
+![Caratteristica ID - VGS Regioni](../../Immagini/mosfet_id_vgs_regioni.png)
+
+#### A) Se fissiamo un $V_{DS}$ intermedio (es. $V_{DS} = 0.35\,\text{V}$):
+All'aumentare di $V_{GS}$ da zero verso tensioni elevate, il transistor attraversa in sequenza:
+1. **$V_{GS} < V_{th}$ (Debole Inversione / Sottosoglia):**  
+   Corrente di diffusione esponenziale (invisibile in scala lineare, retta su scala logaritmica con pendenza $S \approx 78\,\text{mV/dec}$).
+2. **Subito sopra la soglia ($V_{th} < V_{GS} < V_{th} + V_{DS}$):**  
+   L'overdrive $V_{ov} = V_{GS} - V_{th}$ è piccolo ($V_{ov} < V_{DS}$).  
+   Il canale al drain è strozzato (**Pinch-off $\implies$ SATURAZIONE**). La corrente vale:
+   $$I_D = \frac{1}{2}\mu C_{ox}\frac{W}{L}(V_{GS}-V_{th})^2$$
+   Rispetto a $V_{GS}$, la curva è un **tratto di PARABOLA**!
+3. **Aumentando ancora $V_{GS}$ ($V_{GS} > V_{th} + V_{DS}$):**  
+   L'overdrive supera il drain fissato ($V_{ov} > V_{DS}$).  
+   Il canale non è più strozzato al drain: il transistor entra in **LINEARE (TRIODO)**!  
+   Con $V_{DS}$ fissato costante, la formula di triodo diventa:
+   $$I_D = \mu C_{ox}\frac{W}{L}\left[(V_{GS}-V_{th})V_{DS} - \frac{1}{2}V_{DS}^2\right] = \underbrace{\left(\mu C_{ox}\frac{W}{L}V_{DS}\right)}_{\text{Pendenza costante}}\cdot V_{GS} + \text{costante}$$
+   Rispetto a $V_{GS}$, la curva si raddrizza e diventa una **RETTA**!
+
+#### B) Se fissiamo un $V_{DS}$ molto piccolo (es. $V_{DS} = 50\,\text{mV}$):
+* L'intervallo di saturazione ($V_{ov} < 50\,\text{mV}$) è una finestrella microscopica quasi coincidente con la moderata inversione.
+* Per tutto il funzionamento utile sopra soglia, il transistor è **SEMPRE IN LINEARE** (la curva verde è una retta continua).
+* 👉 **Applicazione pratica nei test di laboratorio:** si impone $V_{DS} = 50\,\text{mV}$ appositamente per estrarre la soglia $V_{th}$ (estrapolando la retta a $I_D=0$) e ricavare $\mu C_{ox}\frac{W}{L}$ dalla pendenza.
+
+#### C) Se fissiamo un $V_{DS}$ alto (es. $V_{DS} = V_{DD} = 1.0 \div 1.5\,\text{V}$):
+* Poiché nei circuiti $V_{GS} \le V_{DD}$, risulta sempre $V_{ov} < V_{DS}$.
+* Il dispositivo è **SEMPRE IN SATURAZIONE** (la curva blu è una parabola pura su tutto l'intervallo).
+
+---
+
+### 5. I Due Assi Indipendenti: La Mappa 2D $(V_{GS}, V_{DS})$
+
+Spesso si fa confusione tra le regioni di inversione e i regimi di drain. Si tratta di **due decisioni fisiche completamente indipendenti (ortogonali)**:
+
+![Mappa 2D Regioni MOSFET](../../Immagini/mosfet_mappa_regioni_2d.png)
+
+1. **Asse 1: Regime di Inversione (Deciso da $V_{GS}$, carica nel canale):**
+   * **Debole Inversione (Sottosoglia, $V_{GS} < V_{th}$):** pochi portatori, trasporto per diffusione.
+   * **Moderata Inversione ($V_{GS} \approx V_{th}$):** transizione continua diffusione/deriva.
+   * **Forte Inversione ($V_{GS} \gg V_{th}$):** tanti portatori, trasporto dominato dalla deriva (drift).
+2. **Asse 2: Regime di Drain (Deciso da $V_{DS}$ rispetto a $V_{dsat}$):**
+   * **Lineare / Triodo ($V_{DS} < V_{dsat}$):** canale continuo da Source a Drain.
+   * **Saturazione ($V_{DS} \ge V_{dsat}$):** canale strozzato (pinch-off o saturazione di velocità).
+
+| Livello di Inversione (deciso da $V_{GS}$) | $V_{dsat}$ locale | Regime Lineare ($V_{DS} < V_{dsat}$) | Regime Saturato ($V_{DS} \ge V_{dsat}$) |
+| :--- | :--- | :--- | :--- |
+| **Debole Inversione (Sottosoglia)** | $\approx 3\div 4 V_T \approx 100\,\text{mV}$ (costante!) | Lineare di debole inv. ($V_{DS} < 100\,\text{mV}$) | Saturazione di debole inv. ($V_{DS} \ge 100\,\text{mV}$) |
+| **Moderata Inversione** | Raccordo continuo $\sim 100\,\text{mV} \to V_{ov}$ | Moderata lineare | Moderata saturata |
+| **Forte Inversione** | $V_{dsat} = V_{ov} = V_{GS} - V_{th}$ | **Triodo (Lineare)**: retta con $V_{DS}$ | **Saturazione**: parabola con $V_{GS}$ |
+
+> Quando tracciamo la caratteristica $I_D - V_{GS}$ a $V_{DS} = 0.35\,\text{V}$, tracciamo un **taglio orizzontale** a quota $0.35\,\text{V}$ sulla mappa:  
+> Poiché $0.35\,\text{V} > 100\,\text{mV}$, attraversiamo prima **Debole Saturata** $\to$ **Moderata Saturata** $\to$ **Forte Saturata (Parabola)** e solo dopo che la retta rossa $V_{dsat}$ sale oltre $0.35\,\text{V}$ entriamo in **Forte Lineare (Retta)**!
+
 ---
 
 *Pagine correlate:*
 - [La soglia da cosa dipende](./La%20soglia%20da%20cosa%20dipende.md)
 - [MOS](./MOS.md)
+- [Transconduttanza Reale e Degrado di Mobilità](./Transconduttanza%20Reale%20e%20Degrado%20di%20Mobilita.md)
+- [Rumore nel MOSFET](./Rumore%20nel%20MOSFET.md)
 - [Conduzione di Sottosoglia e Rapporto Ion/Ioff](../Effetti%20di%20Canale%20Corto/Rapporto%20Ion%20Ioff%20e%20sottosoglia.md)
+- [Crollo della Resistenza di Uscita (ro)](../Effetti%20di%20Canale%20Corto/Crollo%20di%20ro.md)
+- [Portatori Caldi (Hot Carriers)](../Effetti%20di%20Canale%20Corto/Hot%20carriers.md)
 - [Saturazione di velocità](../Effetti%20di%20Canale%20Corto/Saturazione%20di%20velocita.md)
 - [Matching e Variabilita nei Componenti Integrati](./Matching%20e%20Variabilita%20nei%20Componenti%20Integrati.md)
 - [Capacità parassite nel MOSFET](./Capacit%C3%A0%20parassite%20nel%20MOSFET.md)
 - [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
-- [Analogico non si scende di dimensioni](../Scaling%20e%20Limiti%20Fisici/Analogico%20non%20si%20scende%20di%20dimensioni.md)
 - [BJT](./BJT.md)
+

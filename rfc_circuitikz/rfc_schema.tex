@@ -1,0 +1,235 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\geometry{margin=1.8cm}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage[siunitx,european,cuteinductors]{circuitikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+
+\definecolor{primary}{RGB}{0,70,140}
+\definecolor{accentred}{RGB}{190,25,25}
+\definecolor{accentgreen}{RGB}{20,120,50}
+\definecolor{accentpurple}{RGB}{110,40,150}
+\definecolor{nodeblue}{RGB}{0,100,200}
+
+\title{\textbf{\LARGE Recycling Folded Cascode (RFC)}\\\Large Topologia Circuitale e Analisi dei Percorsi di Corrente}
+\author{Microelettronica --- Slide 9, 10, 11 (Prof.ssa Richelli)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{La risposta alla tua domanda: Dove va la corrente dei rami $K$?}
+
+\begin{center}
+\fcolorbox{accentred}{white}{
+\begin{minipage}{0.94\textwidth}
+\bfseries\color{accentred}\large
+I transistor con rapporto $K$ ($M_{3b}$ e $M_{4b}$) hanno il Source collegato a massa (GND) e il Drain collegato direttamente al rispettivo Nodo di Folding ($F_L$ o $F_R$).
+
+Pertanto, la loro corrente \underline{scende dal nodo di folding e va a MASSA (GND)}!
+\end{minipage}
+}
+\end{center}
+
+\vspace{0.3cm}
+\noindent Per visualizzarlo bene:
+\begin{itemize}
+    \item Nel \textbf{Folded Cascode classico} c'era un generatore di corrente statico verso massa che assorbiva una corrente costante $I_{\text{sink}}$.
+    \item Nel \textbf{Recycling Folded Cascode (RFC)}, quel generatore statico viene rimosso e \textbf{sostituito proprio dal transistor $K$}!
+    \item Il transistor $K$ funge quindi da \textbf{generatore di corrente dinamico verso massa}: quando il segnale gli dice di condurre di più, ``succhia'' via più corrente dal nodo di folding verso massa.
+    \item Per la legge di Kirchhoff al nodo di folding:
+    \begin{equation}
+        I_{\text{cascode}} = I_{\text{sink}}(K) - I_{\text{in}}
+    \end{equation}
+    Poiché $I_{\text{sink}}(K)$ aumenta e contemporaneamente $I_{\text{in}}$ diminuisce, la corrente che deve scendere dal cascode verso l'uscita subisce una \textbf{variazione doppia}, raddoppiando la transconduttanza e il guadagno!
+\end{itemize}
+
+---
+
+\newpage
+\section{Schema Circuitale Dettagliato (Circuitikz)}
+
+\begin{center}
+\begin{circuitikz}[scale=0.88, transform shape]
+    % ==========================================
+    % BINARIO VDD E GENERATORE DI CODA (IN CIMA)
+    % ==========================================
+    \draw (0,15.2) node[above, font=\bfseries\large]{$+V_{DD}$} -- ++(0,-0.4) coordinate (vdd_top);
+    \draw (vdd_top) to[isource, l_=\textbf{\Large $2I_B$}] ++(0,-1.3) coordinate (tail_node);
+    \fill (tail_node) circle (2.5pt);
+
+    % Rotaia source coppia d'ingresso
+    \draw [thick] (-4.5, 13.5) coordinate (p1a_s) -- (4.5, 13.5) coordinate (p2a_s);
+    \coordinate (p1b_s) at (-1.8, 13.5);
+    \coordinate (p2b_s) at (1.8, 13.5);
+
+    % ==========================================
+    % COPPIA DIFFERENZIALE SDOPPIATA (4 PMOS)
+    % ==========================================
+    % M1a e M1b orientati verso sinistra, M2b e M2a verso destra
+    \node [pmos] (M1a) at (p1a_s) [anchor=source] {};
+    \node [pmos] (M1b) at (p1b_s) [anchor=source, xscale=-1] {};
+    \node [pmos] (M2b) at (p2b_s) [anchor=source] {};
+    \node [pmos] (M2a) at (p2a_s) [anchor=source, xscale=-1] {};
+
+    \node at (M1a.center) [right=6pt, font=\bfseries] {$M_{1a}$};
+    \node at (M1b.center) [left=6pt, font=\bfseries] {$M_{1b}$};
+    \node at (M2b.center) [right=6pt, font=\bfseries] {$M_{2b}$};
+    \node at (M2a.center) [left=6pt, font=\bfseries] {$M_{2a}$};
+
+    % Ingressi differenziali puliti
+    \draw (M1a.gate) -- ++(-0.6,0) coordinate (in_L_term) node[left, font=\huge\bfseries\color{primary}] {$V_{in}^+$};
+    \draw (M1a.gate) to[short, *-] (M1b.gate);
+
+    \draw (M2a.gate) -- ++(0.6,0) coordinate (in_R_term) node[right, font=\huge\bfseries\color{primary}] {$V_{in}^-$};
+    \draw (M2a.gate) to[short, *-] (M2b.gate);
+
+    % ==========================================
+    % NODI DI FOLDING (FL e FR)
+    % ==========================================
+    \coordinate (FL) at (-4.5, 4.2);
+    \coordinate (FR) at (4.5, 4.2);
+
+    % Percorsi diretti: M1a -> FL, M2a -> FR
+    \draw [ultra thick] (M1a.drain) -- (FL) node[circ]{} node[left=6pt, nodeblue, font=\Large\bfseries]{Nodo $F_L$};
+    \draw [ultra thick] (M2a.drain) -- (FR) node[circ]{} node[right=6pt, nodeblue, font=\Large\bfseries]{Nodo $F_R$};
+
+    % ==========================================
+    % INCROCIO RICICLATO VERSO GLI SPECCHI
+    % ==========================================
+    \coordinate (cross_L_top) at (-1.8, 10.5);
+    \coordinate (cross_R_top) at (1.8, 10.5);
+    \coordinate (diode_L_in) at (-1.8, 2.8);
+    \coordinate (diode_R_in) at (1.8, 2.8);
+
+    \draw [thick, accentpurple] (M1b.drain) -- (cross_L_top) -- (diode_R_in);
+    \draw [thick, accentgreen] (M2b.drain) -- (cross_R_top) -- (diode_L_in);
+
+    % ==========================================
+    % SPECCHI DI CORRENTE IN BASSO (1 : K)
+    % ==========================================
+    % Specchio Sinistro: M3a (dim. 1, diodo) e M3b (dim. K)
+    \node [nmos] (M3b) at (-4.5, 1.2) [anchor=drain] {};
+    \node [nmos] (M3a) at (-1.8, 1.2) [anchor=drain] {};
+
+    \node at (M3b.center) [left=10pt, font=\Large\bfseries\color{accentred}] {$M_{3b}$ ($K$)};
+    \node at (M3a.center) [below=15pt, font=\bfseries] {$M_{3a}$ ($1$)};
+
+    \draw [ultra thick] (FL) -- (M3b.drain);
+    \draw (diode_L_in) -- (M3a.drain) node[circ]{};
+    \draw (M3a.drain) -- (M3a.gate) node[circ]{};
+    \draw (M3a.gate) -- (M3b.gate);
+    \draw (M3a.source) node[ground]{};
+    \draw (M3b.source) node[ground]{};
+
+    % Specchio Destro: M4a (dim. 1, diodo) e M4b (dim. K)
+    \node [nmos] (M4a) at (1.8, 1.2) [anchor=drain, xscale=-1] {};
+    \node [nmos] (M4b) at (4.5, 1.2) [anchor=drain, xscale=-1] {};
+
+    \node at (M4a.center) [below=15pt, font=\bfseries] {$M_{4a}$ ($1$)};
+    \node at (M4b.center) [right=10pt, font=\Large\bfseries\color{accentred}] {$M_{4b}$ ($K$)};
+
+    \draw [ultra thick] (FR) -- (M4b.drain);
+    \draw (diode_R_in) -- (M4a.drain) node[circ]{};
+    \draw (M4a.drain) -- (M4a.gate) node[circ]{};
+    \draw (M4a.gate) -- (M4b.gate);
+    \draw (M4a.source) node[ground]{};
+    \draw (M4b.source) node[ground]{};
+
+    % FRECCE CHE EVIDENZIANO IL FLUSSO DELLA CORRENTE DI K VERSO MASSA
+    \draw [-{Stealth[length=4mm]}, line width=2.5pt, accentred] (-4.5, 3.4) -- (-4.5, 1.9)
+          node[midway, left=3pt, font=\bfseries\small] {Scende a GND!};
+    \draw [-{Stealth[length=4mm]}, line width=2.5pt, accentred] (4.5, 3.4) -- (4.5, 1.9)
+          node[midway, right=3pt, font=\bfseries\small] {Scende a GND!};
+
+    % ==========================================
+    % RAMI CASCODE NMOS (M5 e M6)
+    % ==========================================
+    \coordinate (casc_L_s) at (-3.2, 4.2);
+    \coordinate (casc_R_s) at (3.2, 4.2);
+    \draw [thick] (FL) -- (casc_L_s);
+    \draw [thick] (FR) -- (casc_R_s);
+
+    \node [nmos] (M5) at (casc_L_s) [anchor=source] {};
+    \node [nmos] (M6) at (casc_R_s) [anchor=source, xscale=-1] {};
+    \node at (M5.center) [right=6pt, font=\bfseries] {$M_5$};
+    \node at (M6.center) [left=6pt, font=\bfseries] {$M_6$};
+
+    \draw (M5.gate) -- (M6.gate);
+    \draw (M5.gate) -- ++(-0.4,0) node[left, font=\small\bfseries] {$V_{b,N}$};
+
+    % ==========================================
+    % CARICO CASCODE PMOS (M7, M8, M9, M10)
+    % ==========================================
+    % Transistor Cascode PMOS inferiori
+    \node [pmos] (M7) at (-3.2, 6.8) [anchor=drain] {};
+    \node [pmos] (M8) at (3.2, 6.8) [anchor=drain, xscale=-1] {};
+    \node at (M7.center) [right=6pt, font=\bfseries] {$M_7$};
+    \node at (M8.center) [left=6pt, font=\bfseries] {$M_8$};
+
+    \draw [thick] (M5.drain) -- (M7.drain);
+    \draw [thick] (M6.drain) -- (M8.drain) coordinate[midway] (out_node);
+    \fill (out_node) circle (3pt);
+    \draw [ultra thick] (out_node) -- ++(1.5,0) node[right, red, font=\huge\bfseries] {$V_{OUT}$};
+
+    \draw (M7.gate) -- (M8.gate);
+    \draw (M7.gate) -- ++(-0.4,0) node[left, font=\small\bfseries] {$V_{b,P2}$};
+
+    % Transistor PMOS superiori (Specchio / Generatori)
+    \node [pmos] (M9) at (-3.2, 8.8) [anchor=drain] {};
+    \node [pmos] (M10) at (3.2, 8.8) [anchor=drain, xscale=-1] {};
+    \node at (M9.center) [right=6pt, font=\bfseries] {$M_9$};
+    \node at (M10.center) [left=6pt, font=\bfseries] {$M_{10}$};
+
+    \draw (M7.source) -- (M9.drain);
+    \draw (M8.source) -- (M10.drain);
+
+    \draw (M9.source) -- ++(0,0.5) node[above, font=\bfseries] {$+V_{DD}$};
+    \draw (M10.source) -- ++(0,0.5) node[above, font=\bfseries] {$+V_{DD}$};
+    \draw (M9.gate) -- (M10.gate);
+    \draw (M9.gate) -- ++(-0.4,0) node[left, font=\small\bfseries] {$V_{b,P1}$};
+
+\end{circuitikz}
+\end{center}
+
+---
+
+\newpage
+\section{Tracciamento Passo-Passo delle Correnti}
+
+Immagina di applicare un piccolo segnale differenziale:
+$$V_{in}^+ \text{ sale } (\uparrow) \qquad \text{e} \qquad V_{in}^- \text{ scende } (\downarrow)$$
+
+\subsection*{Cosa succede sul lato sinistro (Nodo $F_L$)?}
+Al nodo di folding sinistro $F_L$ si incontrano tre correnti:
+\begin{itemize}
+    \item \textbf{Dall'alto}: Scende la corrente del PMOS d'ingresso $M_{1a}$. Poiché il suo Gate ($V_{in}^+$) sale, la tensione $V_{SG}$ diminuisce, quindi $M_{1a}$ conduce \textbf{meno corrente} ($-\Delta I$).
+    \item \textbf{Dal basso}: C'è il transistor $M_{3b}$ (con dimensione $K$) che tira corrente verso massa. Da dove riceve il comando il suo Gate?
+    \begin{itemize}
+        \item Il Gate di $M_{3b}$ è collegato al diodo $M_{3a}$.
+        \item Nel diodo $M_{3a}$ entra la corrente di $M_{2b}$ (che sta sull'altro ramo differenziale!).
+        \item Poiché $V_{in}^-$ è sceso, $M_{2b}$ conduce \textbf{più corrente} ($+\Delta I$).
+        \item Questa corrente entra in $M_{3a}$ e viene \textbf{moltiplicata per $K$} su $M_{3b}$!
+        \item Quindi $M_{3b}$ adesso vuole tirare verso massa una corrente maggiorata di \textbf{$+K \cdot \Delta I$}!
+    \end{itemize}
+    \item \textbf{La sintesi al nodo $F_L$:}
+    Il transistor sotto ($M_{3b}$) richiede più corrente ($+K\Delta I$), mentre il transistor sopra ($M_{1a}$) gliene fornisce di meno ($-\Delta I$).  
+    Per rispettare la legge di Kirchhoff al nodo $F_L$, l'unica via rimasta è il cascode $M_5$:
+    $$\Delta I_{\text{cascode}} = \Delta I_{\text{sotto}} - \Delta I_{\text{sopra}} = (+K \Delta I) - (-\Delta I) = \mathbf{(K + 1) \cdot \Delta I}$$
+\end{itemize}
+
+\subsection*{Perché questo è straordinario?}
+Nel folded cascode classico, il generatore sotto era fisso ($\Delta I_{\text{sotto}} = 0$), quindi la variazione nel cascode era solo $\Delta I$.  
+Nell'RFC la variazione diventa $(K+1) \cdot \Delta I$!
+
+Scegliendo tipicamente \textbf{$K = 3$}:
+$$\Delta I_{\text{cascode}} = (3 + 1) \cdot \Delta I = 4 \cdot \Delta I$$
+Poiché l'ingresso è stato sdoppiato a metà ($\Delta I = \frac{1}{2} \cdot \Delta I_{\text{totale}}$), la variazione netta è:
+$$G_{m,RFC} = 2 \cdot g_{m,classico}$$
+\textbf{La transconduttanza e il guadagno raddoppiano ($+6\text{ dB}$) a costo zero di potenza!}
+
+\end{document}

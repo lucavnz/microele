@@ -52,9 +52,48 @@ Per ottenere amplificatori ad alto guadagno (es. operazionali con $A_{v0} \ge 80
 * Nelle tecnologie nanometriche avanzate siamo costretti a progettare **amplificatori complessi multistadio** (3 o più stadi), che introducono poli multipli, rendendo molto difficile la stabilizzazione ad anello chiuso e la compensazione in frequenza.
 
 ---
+
+### 4. L'Espressione Completa della Conduttanza di Uscita $g_{ds}$ (Canale Corto)
+
+Nel modello semplificato del primo ordine si assume che $g_{ds} = \lambda I_D$.  
+Nella realtà di un canale corto avanzato, la corrente $I_D$ risente di $V_{DS}$ attraverso **quattro meccanismi fisici simultanei**:
+1. L'accorciamento geometrico del canale $\Delta L$ (**CLM**).
+2. L'abbassamento della soglia indotto dal drain (**DIBL**, $V_{Th}(V_{DS})$).
+3. La degradazione della mobilità con il campo elettrico laterale (**saturazione di velocità**, $\mu(V_{DS})$).
+4. La corrente secondaria di ionizzazione per impatto (**valanga**, $I_S(V_{DS})$).
+
+Differenziando totalmente la corrente di Drain rispetto a $V_{DS}$, si ottiene l'**espressione accurata della conduttanza di uscita**:
+
+$$g_{ds} = \frac{\partial I_D}{\partial V_{DS}} = \mathbf{\lambda I_D} \;-\; \mathbf{g_m \frac{\partial V_{Th}}{\partial V_{DS}}} \;+\; \mathbf{\frac{I_D}{\mu} \frac{\partial \mu}{\partial V_{DS}}} \;+\; \mathbf{\frac{\partial I_S}{\partial V_{DS}}}$$
+
+Analisi dettagliata dei quattro contributi:
+
+| Termine | Meccanismo Fisico | Segno ed Effetto su $g_{ds}$ e $r_o$ |
+| :--- | :--- | :--- |
+| **$\lambda I_D$** | **Modulazione di Canale (CLM - 1° ordine):** pendenza classica dovuta all'arretramento del pinch-off $\Delta L$. | Termine base di saturazione ($r_o \approx \frac{1}{\lambda I_D}$). |
+| **$- g_m \frac{\partial V_{Th}}{\partial V_{DS}}$** | **Effetto DIBL (Canale Corto):** poiché per DIBL la soglia cala con $V_{DS}$ ($\frac{\partial V_{Th}}{\partial V_{DS}} < 0$), con il segno meno davanti questo termine diventa **POSITIVO**. | **Distrugge $r_o$**: all'aumentare di $V_{DS}$ il canale conduce di più perché si abbassa la soglia, aumentando vistosamente la pendenza della curva! |
+| **$+ \frac{I_D}{\mu} \frac{\partial \mu}{\partial V_{DS}}$** | **Saturazione di Velocità:** modula la mobilità efficace con il campo medio orizzontale $V_{DS}/L$. | Riduce la transconduttanza efficace e altera la pendenza dinamica. |
+| **$+ \frac{\partial I_S}{\partial V_{DS}}$** | **Moltiplicazione a Valanga (Avalanching):** generazione di coppie elettrone-lacuna per ionizzazione per impatto nella zona svuotata al Drain. | Fa impennare drasticamente $g_{ds}$ verso l'alto a tensioni $V_{DS}$ elevate (fino al breakdown). |
+
+---
+
+### 5. Effetti di Secondo Ordine su $\Delta L$ (Modello Bidimensionale 2D)
+
+Nel modello monodimensionale si assume che l'accorciamento $\Delta L$ dipenda solo dalla caduta di tensione orizzontale $(V_{DS} - V_{sat})$.  
+Nella realtà, la vicinanza dell'elettrodo di Gate genera un campo elettrico di bordo (*fringing field*) che interagisce con la giunzione di Drain in modo bidimensionale. Un'analisi accurata fornisce:
+
+$$\frac{1}{\Delta L} \cong \frac{1}{\Delta L_{\text{(1st order)}}} + \frac{C_{ox}}{\varepsilon_S} \left[ \frac{\alpha(V_{DS} - V_{GS}) + \beta(V_{GS} - V_{sat})}{V_{DS} - V_{sat}} \right]$$
+
+* La contrazione del canale non è decisa solo dal Drain, ma è **modulata attivamente dal potenziale del Gate ($V_{GS}$)** attraverso la capacità di ossido $C_{ox}$.
+
+---
+
 *Pagine correlate:*
-- [Analogico non si scende di dimensioni](../Scaling%20e%20Limiti%20Fisici/Analogico%20non%20si%20scende%20di%20dimensioni.md)
-- [Coppia Differenziale e Cascode Telescopico](../Dispositivi%20e%20Componenti/Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)
 - [DIBL](./DIBL.md)
 - [Saturazione di velocita](./Saturazione%20di%20velocita.md)
+- [Portatori Caldi (Hot Carriers)](./Hot%20carriers.md)
+- [Rumore nel MOSFET](../Dispositivi%20e%20Componenti/Rumore%20nel%20MOSFET.md)
+- [Overdrive e Regioni di Inversione](../Dispositivi%20e%20Componenti/Overdrive%20e%20Regioni%20di%20Inversione.md)
+- [Coppia Differenziale e Cascode Telescopico](../Dispositivi%20e%20Componenti/Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)
+- [Analogico non si scende di dimensioni](../Scaling%20e%20Limiti%20Fisici/Analogico%20non%20si%20scende%20di%20dimensioni.md)
 - [Inverter CMOS e Regioni di Funzionamento](../Famiglie%20Logiche/Inverter%20CMOS%20e%20Regioni%20di%20Funzionamento.md)
