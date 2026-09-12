@@ -33,8 +33,12 @@ Nel microchip i fili viaggiano a distanze sub-micrometriche ($d < 1\,\mu\text{m}
 * **Il campo elettrico** sente la **lunghezza** del filo ($L \to 0 \implies V_{disturbo} \to 0$).
 * **Il campo magnetico** sente l'**area** della spira ($A \to 0 \implies V_{disturbo} \to 0$).
 
+> 💡 **Nota a livello circuitale:** Sebbene la geometria microscopica protegga il silicio dai campi irradiati, le interferenze RF condotte che entrano attraverso i pin possono comunque generare offset DC per via del raddrizzamento non lineare dei MOS. A livello circuitale, la difesa si basa sulla simmetria dello Slew Rate e su strutture differenziali bilanciate.  
+> 👉 Approfondimento: [Immunità alle EMI e Slew Rate Asimmetrico](../Dispositivi%20e%20Componenti/Immunit%C3%A0%20alle%20EMI%20e%20Slew%20Rate%20Asimmetrico.md)
+
 ---
 
 *Pagine correlate:*
+- [Immunità alle EMI e Slew Rate Asimmetrico](../Dispositivi%20e%20Componenti/Immunit%C3%A0%20alle%20EMI%20e%20Slew%20Rate%20Asimmetrico.md)
 - [Difficoltà nel fare un componente ideale](./Difficolt%C3%A0%20nel%20fare%20un%20componente%20ideale.md)
 - [Analogico non si scende di dimensioni](./Analogico%20non%20si%20scende%20di%20dimensioni.md)

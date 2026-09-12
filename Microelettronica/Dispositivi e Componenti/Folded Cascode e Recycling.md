@@ -30,7 +30,7 @@ Osserviamo lo schema del Folded Cascode classico (Prof.ssa Richelli, Slide 9):
 
 #### Lo spreco di potenza e rumore:
 1. **Rami "morti" per il segnale AC:** Quei due transistor verso massa hanno il Gate collegato a una tensione DC fissa (massa virtuale in AC). A piccolo segnale la loro variazione di corrente è nulla ($i_{ac} = 0$): **non contribuiscono affatto alla transconduttanza ($g_m$) né al guadagno!**
-2. **Consumo elevato:** Bruciano più del $50\%$ dell'intera corrente statica del circuito solo per garantire la polarizzazione DC.
+2. **Consumo elevato:** Bruciano più del $50\%$ dell'intera corrente statica del circuito solo per garantire la polarizzazione DC (imposta tramite appositi [Riferimenti di Corrente e Circuiti di Start-Up](./Riferimenti%20di%20Corrente%20e%20Start-Up.md)).
 3. **Rumore termico e flicker:** Essendo dispositivi percorsi da molta corrente, iniettano una quota cospicua di [Rumore nel MOSFET](./Rumore%20nel%20MOSFET.md) direttamente nei nodi di segnale.
 
 La transconduttanza complessiva del Folded Cascode classico (con carico a specchio single-ended) rimane semplicemente:
@@ -132,6 +132,10 @@ Come evidenziato nella Slide 11:
 ---
 
 *Pagine correlate:*
+- [Riferimenti di Corrente e Circuiti di Start-Up](./Riferimenti%20di%20Corrente%20e%20Start-Up.md)
+- [Amplificatori Rail-to-Rail](./Amplificatori%20Rail-to-Rail.md)
+- [Amplificatori Fully-Differential e CMFB](./Amplificatori%20Fully-Differential%20e%20CMFB.md)
+- [Immunità alle EMI e Slew Rate Asimmetrico](./Immunit%C3%A0%20alle%20EMI%20e%20Slew%20Rate%20Asimmetrico.md)
 - [Coppia Differenziale e Cascode Telescopico](./Coppia%20Differenziale%20e%20Cascode%20Telescopico.md)
 - [Gain Boosting (Regulated Cascode)](./Gain%20Boosting.md)
 - [Overdrive e Regioni di Inversione](./Overdrive%20e%20Regioni%20di%20Inversione.md)

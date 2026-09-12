@@ -215,6 +215,8 @@ Se le distanze minime imposte dalla fonderia vengono violate, le tolleranze di f
 ---
 
 *Pagine correlate:*
+- [Immunità alle EMI e Slew Rate Asimmetrico](./Immunit%C3%A0%20alle%20EMI%20e%20Slew%20Rate%20Asimmetrico.md)
+- [Amplificatori Rail-to-Rail](./Amplificatori%20Rail-to-Rail.md)
 - [Dimensionamento Transistor e Ritardo di Pattern (Sizing)](../Circuiti%20Combinatori%20CMOS/Dimensionamento%20Transistor%20e%20Ritardo%20di%20Pattern%20(Sizing).md)
 - [Effetto di Fan-In e Fan-Out sul Ritardo (Elmore)](../Circuiti%20Combinatori%20CMOS/Effetto%20di%20Fan-In%20e%20Fan-Out%20sul%20Ritardo%20(Elmore).md)
 - [Tecniche di Ottimizzazione per Porte Complesse Veloci](../Circuiti%20Combinatori%20CMOS/Tecniche%20di%20Ottimizzazione%20per%20Porte%20Complesse%20Veloci.md)

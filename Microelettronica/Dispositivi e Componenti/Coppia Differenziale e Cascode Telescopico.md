@@ -6,7 +6,7 @@ La **coppia differenziale** è il blocco fondamentale dell'amplificazione analog
 
 ### 1. Coppia Differenziale MOS e Dipendenza Termica del Guadagno
 
-Consideriamo una coppia differenziale classica polarizzata da un generatore di coda a corrente costante $I_{SS}$ (*tail current*):
+Consideriamo una coppia differenziale classica polarizzata da un generatore di coda a corrente costante $I_{SS}$ (*tail current*, generato tramite [Riferimenti di Corrente e Circuiti di Start-Up](./Riferimenti%20di%20Corrente%20e%20Start-Up.md)):
 
 ```
           VDD               VDD
@@ -118,6 +118,9 @@ Poiché $A_{v0} \approx \frac{1}{2}(g_m r_o)^2$, e ciascun fattore intrinseco $g
 ---
 
 *Pagine correlate:*
+- [Riferimenti di Corrente e Circuiti di Start-Up](./Riferimenti%20di%20Corrente%20e%20Start-Up.md)
+- [Amplificatori Rail-to-Rail](./Amplificatori%20Rail-to-Rail.md)
+- [Amplificatori Fully-Differential e CMFB](./Amplificatori%20Fully-Differential%20e%20CMFB.md)
 - [Folded Cascode e Recycling](./Folded%20Cascode%20e%20Recycling.md)
 - [Gain Boosting (Regulated Cascode)](./Gain%20Boosting.md)
 - [Effetto Miller](./Effetto%20Miller.md)

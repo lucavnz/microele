@@ -101,6 +101,7 @@ Quando transistor MOS sono posti in serie (come nelle catene di pull-down delle 
 * Il dispositivo con Source a massa ha $V_{SB1} = 0\text{ V}$ e soglia nominale $V_{th0}$.
 * I transistor sovrastanti vedono il proprio Source a tensioni via via crescenti ($V_S > 0\text{ V}$), imponendo **$V_{SB} > 0\text{ V}$**.
 * **La soglia $V_{th}$ aumenta progressivamente salendo verso il Drain**, riducendo la corrente e aumentando la resistenza dinamica di canale.
+* **Nei riferimenti di corrente integrati:** Come analizzato in [Riferimenti di Corrente e Circuiti di Start-Up](./Riferimenti%20di%20Corrente%20e%20Start-Up.md), inserire un resistore di degenerazione $R_S$ al source di un NMOS solleva $V_S = R_S I_{out} > 0\text{ V}$, provocando $V_{SB} > 0\text{ V}$ e distorcendo il bilanciamento delle soglie tra i rami dello specchio.
 
 ---
 
@@ -117,6 +118,7 @@ La formula classica monodimensionale a canale lungo assume che $V_{th}$ non dipe
 ---
 
 *Pagine correlate:*
+- [Riferimenti di Corrente e Circuiti di Start-Up](./Riferimenti%20di%20Corrente%20e%20Start-Up.md)
 - [Overdrive e Regioni di Inversione](./Overdrive%20e%20Regioni%20di%20Inversione.md)
 - [Layout e Tecniche di Progettazione dei MOS](./Layout%20e%20Tecniche%20di%20Progettazione%20dei%20MOS.md)
 - [MOS](./MOS.md)
